@@ -6,6 +6,13 @@
     <title>Cleaning Services in Chennai | DirtFree</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <script src="cart.js" defer></script>
+    <script>
+        // Set location on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            cart.setLocation('Chennai');
+        });
+    </script>
 </head>
 <body>
 
@@ -31,7 +38,7 @@
                     </div>
                     </div> -->
                 <a href="index.html">Home</a>
-                <a href="booking.html?service=Washroom%20Cleaning&price=189&number=917470625893" class="card-btn">Book Now</a>
+                <a href="booking.html" class="card-btn book-now-btn">Book Now</a>
             </nav>
         </div>
     </header>
@@ -76,15 +83,7 @@
             <div class="card-overlay-content">
                 <h3>Washroom Cleaning</h3>
                 <p>starting from <strong>₹189.</strong></p>
-                <a href="#" class="card-btn">View Services</a>
-            </div>
-        </div>
-
-        <div class="booking-card" style="background-image:url('Images/flat.png');">
-            <div class="card-overlay-content">
-                <h3>Flat Cleaning</h3>
-                <p>Complete flat cleaning starting from <strong>₹1499.</strong></p> 
-                <a href="#" class="card-btn">View Services</a>
+                <a href="service.html?service=Washroom%20Cleaning" class="card-btn">View Services</a>
             </div>
         </div>
 
@@ -92,22 +91,31 @@
             <div class="card-overlay-content">
                 <h3>Kitchen Cleaning</h3>
                 <p>starting from <strong>₹499.</strong></p>
-                <a href="#" class="card-btn">View Services</a>
+                <a href="service.html?service=Kitchen%20Cleaning" class="card-btn">View Services</a>
+            </div>
+        </div>
+
+        <div class="booking-card" style="background-image:url('Images/flat.png');">
+            <div class="card-overlay-content">
+                <h3>Flat Cleaning</h3>
+                <p>Complete flat cleaning starting from <strong>₹1499.</strong></p> 
+                <a href="service.html?service=Flat%20Cleaning" class="card-btn">View Services</a>
             </div>
         </div>
 
         <div class="booking-card" style="background-image:url('Images/Car.png');">
             <div class="card-overlay-content">
-                <h3>Car Polish</h3>
-                <p>starting from <strong>₹1299.</strong></p>
-                <a href="#" class="card-btn">View Services</a>
+                <h3>Car Cleaning</h3>
+                <p>starting from <strong>₹599.</strong></p>
+                <a href="service.html?service=Car%20Cleaning" class="card-btn">View Services</a>
             </div>
         </div>
+
         <div class="booking-card" style="background-image:url('Images/WT.png');">
             <div class="card-overlay-content">
-                <h3>Tank Cleaning</h3>
-                <p>starting from <strong>₹499.</strong></p>
-                <a href="#" class="card-btn">View Services</a>
+                <h3>Water Tank Cleaning</h3>
+                <p>starting from <strong>₹799.</strong></p>
+                <a href="service.html?service=Water%20Tank%20Cleaning" class="card-btn">View Services</a>
             </div>
         </div>
     </div>

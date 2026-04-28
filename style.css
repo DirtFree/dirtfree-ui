@@ -24,6 +24,13 @@ body {
     padding-top: 80px; /* Space for fixed header */
 }
 
+/* --- Book now --- */
+.disabled {
+    pointer-events: none;
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
 /* --- FIXED HEADER --- */
 .main-header {
     position: fixed;

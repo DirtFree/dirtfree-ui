@@ -6,8 +6,482 @@
     <title>Complete Your Booking | DirtFree</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <style>
+        .checkout-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .checkout-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .checkout-tag {
+            display: inline-block;
+            background: #e0f7f4;
+            color: #1a8a80;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .checkout-header h1 {
+            font-size: 42px;
+            font-weight: 800;
+            color: #1a1a1a;
+            margin-bottom: 16px;
+        }
+
+        .checkout-header p {
+            font-size: 16px;
+            color: #999;
+        }
+
+        .checkout-content {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 30px;
+        }
+
+        .cart-section {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .cart-section h2 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #4A90E2;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            background: #f9f9f9;
+        }
+
+        .cart-item-info {
+            flex: 1;
+        }
+
+        .cart-item-service {
+            font-size: 14px;
+            color: #999;
+            margin-bottom: 4px;
+        }
+
+        .cart-item-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .cart-item-details {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .cart-item-quantity {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 20px;
+        }
+
+        .qty-btn {
+            width: 28px;
+            height: 28px;
+            border: 1px solid #e0e0e0;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .qty-btn:hover {
+            background: #4A90E2;
+            color: white;
+            border-color: #4A90E2;
+        }
+
+        .qty-display {
+            min-width: 30px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .cart-item-price {
+            text-align: right;
+            min-width: 80px;
+        }
+
+        .cart-item-total {
+            font-size: 16px;
+            font-weight: 700;
+            color: #4A90E2;
+        }
+
+        .cart-item-subtitle {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .remove-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: #fee;
+            color: #e74c3c;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s;
+        }
+
+        .remove-btn:hover {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-cart-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        .empty-cart h3 {
+            font-size: 20px;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .empty-cart p {
+            margin-bottom: 24px;
+        }
+
+        .empty-cart-btn {
+            display: inline-block;
+            background: #4A90E2;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .empty-cart-btn:hover {
+            background: #357ABD;
+        }
+
+        .summary-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 20px;
+        }
+
+        .summary-card h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 20px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .summary-row.total {
+            border-top: 2px solid #e0e0e0;
+            padding-top: 16px;
+            margin-top: 16px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        .summary-value {
+            font-weight: 600;
+            color: #4A90E2;
+        }
+
+        .summary-value.total {
+            color: #4A90E2;
+            font-size: 24px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn-back {
+            flex: 1;
+            padding: 14px 24px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            color: #666;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .btn-back:hover {
+            border-color: #4A90E2;
+            color: #4A90E2;
+        }
+
+        .btn-proceed {
+            flex: 1;
+            padding: 14px 24px;
+            background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-proceed:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
+        }
+
+        .btn-proceed:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        @media (max-width: 768px) {
+            .checkout-content {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-card {
+                position: static;
+            }
+        }
+    </style>
 </head>
-<body style="background-color: #f8fafc; padding-top: 100px;">
+<body>
+
+    <header class="main-header">
+        <div class="header-container">
+            <a href="index.html" class="logo-link">
+                <div class="logo">
+                    <div class="logo-img">
+                        <svg viewBox="0 0 100 100" width="35" height="35">
+                            <circle cx="50" cy="50" r="48" fill="#4A90E2" />
+                            <path d="M50 20 L50 70 M30 70 L70 70 M35 75 L65 75 M40 80 L60 80" stroke="white" stroke-width="6" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <span class="brand-name">DirtFree</span>
+                </div>
+            </a>
+
+            <nav class="nav-menu">
+                <a href="index.html">Home</a>
+                <a href="index.html">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="checkout-container">
+        <div class="checkout-header">
+            <div class="checkout-tag">CHECKOUT</div>
+            <h1>Complete Your Booking</h1>
+            <p>Review your cart, verify your location, and place your order.</p>
+        </div>
+
+        <div class="checkout-content">
+            <div class="cart-section">
+                <h2>
+                    <div class="section-number">1</div>
+                    Cart Overview
+                </h2>
+                <div id="cartItemsContainer"></div>
+            </div>
+
+            <div class="summary-card">
+                <h3>Order Summary</h3>
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span class="summary-value" id="subtotalValue">₹0</span>
+                </div>
+                <div class="summary-row total">
+                    <span>Total</span>
+                    <span class="summary-value total" id="totalValue">₹0</span>
+                </div>
+                <div class="button-group">
+                    <a href="service.html" class="btn-back">← Back</a>
+                    <button id="proceedBtn" class="btn-proceed">Proceed to Booking →</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="cart.js"></script>
+    <script>
+        // Function to get location-specific page
+        function getLocationPage() {
+            const location = cart.getLocation();
+            const locationMap = {
+                'Ahmedabad': 'ahmedabad.html',
+                'Betul': 'betul.html',
+                'Chennai': 'chennai.html',
+                'Ghaziabad': 'ghaziabad.html',
+                'Indore': 'indore.html'
+            };
+            return locationMap[location] || 'service.html';
+        }
+
+        // Set back button href dynamically
+        window.addEventListener('DOMContentLoaded', function() {
+            const backBtn = document.querySelector('.btn-back');
+            if (backBtn) {
+                backBtn.href = getLocationPage();
+            }
+        });
+
+        // Render cart items
+        function renderCart() {
+            const container = document.getElementById('cartItemsContainer');
+            const cartItems = cart.getCart();
+
+            if (cartItems.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-cart">
+                        <div class="empty-cart-icon">🛒</div>
+                        <h3>Your cart is empty</h3>
+                        <p>Add services from our catalog to get started</p>
+                        <a href="service.html" class="empty-cart-btn">Browse Services</a>
+                    </div>
+                `;
+                document.getElementById('proceedBtn').disabled = true;
+                document.getElementById('subtotalValue').textContent = '₹0';
+                document.getElementById('totalValue').textContent = '₹0';
+                return;
+            }
+
+            let html = '';
+            cartItems.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                html += `
+                    <div class="cart-item">
+                        <div class="cart-item-info">
+                            <div class="cart-item-service">${item.service}</div>
+                            <div class="cart-item-name">${item.tier}</div>
+                            <div class="cart-item-details">⏱️ ${item.duration} • ⭐ ${item.rating}</div>
+                        </div>
+                        <div class="cart-item-quantity">
+                            <button class="qty-btn" onclick="updateQty(${item.id}, ${item.quantity - 1})">−</button>
+                            <div class="qty-display">${item.quantity}</div>
+                            <button class="qty-btn" onclick="updateQty(${item.id}, ${item.quantity + 1})">+</button>
+                        </div>
+                        <div class="cart-item-price">
+                            <div class="cart-item-total">₹${itemTotal}</div>
+                            <div class="cart-item-subtitle">₹${item.price} each</div>
+                        </div>
+                        <button class="remove-btn" onclick="removeItem(${item.id})">🗑️</button>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+            updateSummary();
+        }
+
+        function updateQty(itemId, newQty) {
+            if (newQty < 1) {
+                removeItem(itemId);
+            } else {
+                cart.updateQuantity(itemId, newQty);
+                renderCart();
+            }
+        }
+
+        function removeItem(itemId) {
+            cart.removeFromCart(itemId);
+            renderCart();
+        }
+
+        function updateSummary() {
+            const total = cart.getCartTotal();
+            document.getElementById('subtotalValue').textContent = `₹${total}`;
+            document.getElementById('totalValue').textContent = `₹${total}`;
+            
+            const proceedBtn = document.getElementById('proceedBtn');
+            proceedBtn.disabled = cart.getCart().length === 0;
+        }
+
+        document.getElementById('proceedBtn').addEventListener('click', function() {
+            const location = cart.getLocation();
+            if (!location) {
+                alert('Please select a location first!');
+                window.location.href = 'index.html';
+                return;
+            }
+            alert(`Order placed for ${location}! Total: ₹${cart.getCartTotal()}`);
+            // Here you can redirect to payment or confirmation page
+        });
+
+        // Initial render
+        renderCart();
+    </script>
+</body>
+</html>
 
     <header class="main-header">
         <div class="header-container">
@@ -84,7 +558,7 @@
                 </div>
 
                 <div class="booking-footer" style="display: flex; justify-content: space-between; align-items: center;">
-                    <a href="javascript:history.back()" class="btn-back">← Back</a>
+                    <a href="service.html" class="btn-back">← Back</a>
                     <button type="submit" class="btn-place-order" style="background: #00A676; color: white; border: none; padding: 12px 40px; border-radius: 50px; font-weight: 700; cursor: pointer;">Place Order →</button>
                 </div>
             </form>

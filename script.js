@@ -1,15 +1,90 @@
+//Book now script
+document.addEventListener("DOMContentLoaded", function () {
+    const bookBtn = document.getElementById("bookNowBtn");
+    const cityButtons = document.querySelectorAll(".city-btn, .city-item");
+
+    let selectedCity = null;
+
+    // When user selects city
+    cityButtons.forEach(btn => {
+        btn.addEventListener("click", function () {
+            const url = this.getAttribute("data-url");
+
+            // extract city name from url (ghaziabad.html → ghaziabad)
+            selectedCity = url.replace(".html", "");
+
+            // save it
+            localStorage.setItem("selectedCity", selectedCity);
+            document.getElementById("currentCity").innerText = selectedCity;
+            // enable button
+            bookBtn.classList.remove("disabled");
+            bookBtn.removeAttribute("title");
+
+            // update link
+            bookBtn.href = url;
+        });
+    });
+
+    
+    // If already selected before
+    const savedCity = localStorage.getItem("selectedCity");
+    if (savedCity) {
+        bookBtn.classList.remove("disabled");
+        bookBtn.href = savedCity + ".html";
+        bookBtn.removeAttribute("title");
+        document.getElementById("currentCity").innerText = savedCity;
+    }
+
+    // If user clicks while disabled
+    bookBtn.addEventListener("click", function (e) {
+        if (bookBtn.classList.contains("disabled")) {
+            e.preventDefault();
+            bookBtn.title = "Please select a location first";
+        }
+    });
+});
+
+
 document.addEventListener('DOMContentLoaded', () => {
     
     // --- Generic Navigation Function ---
     const navigateToCity = (cityName) => {
-        // Convert city name to lowercase for the filename (e.g., "Ahmedabad" -> "ahmedabad.html")
-        const fileName = cityName.toLowerCase().trim() + ".html";
-        
-        console.log(`Navigating to: ${fileName}`);
-        
-        // Use this to actually change the page:
+    const fileName = cityName.toLowerCase().trim() + ".html";
+
+    // 🧠 Get current location
+    const currentLocation = window.cart.getLocation();
+
+    // ✅ If same city → do nothing
+    if (currentLocation && currentLocation.toLowerCase() === cityName.toLowerCase()) {
+        console.log("Same city selected, no action");
+        return;
+    }
+
+    // 🛑 Ensure cart exists
+    if (typeof window.cart === "undefined") {
         window.location.href = fileName;
-    };
+        return;
+    }
+
+    const cartItems = window.cart.getCart();
+
+    // 🚨 If cart has items → warn
+    if (cartItems.length > 0) {
+        const confirmChange = confirm(
+            "Your cart has items. Changing location will remove them. Continue?"
+        );
+
+        if (!confirmChange) return;
+
+        window.cart.clearCart();
+    }
+
+    // ✅ Set location
+    window.cart.setLocation(cityName);
+
+    // ✅ Navigate to city page
+    window.location.href = fileName;
+};
 
     // --- 1. Dropdown Selection ---
     const cityItems = document.querySelectorAll('.city-item');

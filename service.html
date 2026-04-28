@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Services | DirtFree</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="serviceCategory.css">
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="header-container">
+            <a href="index.html" class="logo-link">
+                <div class="logo">
+                    <div class="logo-img">
+                        <svg viewBox="0 0 100 100" width="35" height="35">
+                            <circle cx="50" cy="50" r="48" fill="#4A90E2" />
+                            <path d="M50 20 L50 70 M30 70 L70 70 M35 75 L65 75 M40 80 L60 80" stroke="white" stroke-width="6" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <span class="brand-name">DirtFree</span>
+                </div>
+            </a>
+
+            <nav class="nav-menu">
+                <a href="index.html">Home</a>
+                <a href="booking.html" class="card-btn">Book Now</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Service Category Component -->
+    <div id="service-category-container"></div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2024 DirtFree. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="cart.js"></script>
+    <script src="serviceCategory.js"></script>
+    <script>
+        // Get service from URL parameter
+        function getServiceFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('service') || 'Washroom Cleaning';
+        }
+
+        // Initialize component with selected service
+        function initWithService() {
+            const selectedService = getServiceFromURL();
+            initServiceCategory('service-category-container', selectedService);
+        }
+
+        // Run when page loads
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initWithService);
+        } else {
+            initWithService();
+        }
+    </script>
+</body>
+</html>
