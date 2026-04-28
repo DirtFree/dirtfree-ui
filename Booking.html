@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Your Booking | DirtFree</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body style="background-color: #f8fafc; padding-top: 100px;">
+
+    <header class="main-header">
+        <div class="header-container">
+            <a href="index.html" class="logo-link">
+                <div class="logo">
+                    <div class="logo-img">
+                        <svg viewBox="0 0 100 100" width="35" height="35">
+                            <circle cx="50" cy="50" r="48" fill="#4A90E2" />
+                            <path d="M50 20 L50 70 M30 70 L70 70 M35 75 L65 75 M40 80 L60 80" stroke="white" stroke-width="6" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <span class="brand-name">DirtFree</span>
+                </div>
+            </a>
+            <nav class="nav-menu">
+                <a href="index.html">Home</a>
+                <a href="index.html#services">Services</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="booking-page-container">
+        <div class="booking-card-main">
+            <div class="booking-header-main">
+                <span class="step-circle">3</span>
+                <h2>Booking Details</h2>
+            </div>
+
+            <form id="finalBookingForm">
+                <div class="input-group">
+                    <label>Your Name *</label>
+                    <input type="text" id="userName" placeholder="Full name" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Phone Number *</label>
+                    <div class="phone-input">
+                        <span class="prefix">+91</span>
+                        <input type="tel" id="userPhone" placeholder="Enter 10 digit number" required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Full Address *</label>
+                    <textarea id="userAddress" rows="3" placeholder="Flat No, Building, Landmark, City" required></textarea>
+                </div>
+
+                <div class="row" style="display: flex; gap: 20px;">
+                    <div class="input-group" style="flex: 1;">
+                        <label>Preferred Date *</label>
+                        <input type="date" id="prefDate" required>
+                    </div>
+                    <div class="input-group" style="flex: 1;">
+                        <label>Preferred Time Slot *</label>
+                        <select id="prefSlot" required style="padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                            <option value="">Select a slot</option>
+                            <option>Morning (9 AM - 12 PM)</option>
+                            <option>Afternoon (1 PM - 4 PM)</option>
+                            <option>Evening (5 PM - 8 PM)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="order-summary" style="background: #f1f5f9; padding: 20px; border-radius: 12px; margin: 20px 0;">
+                    <p style="font-weight: 700; margin-bottom: 10px;">Order Summary</p>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <span id="displayService">Service Name</span>
+                        <span id="displayPrice">₹0</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; border-top: 1px solid #cbd5e1; padding-top: 10px; font-weight: 800; color: #00A676;">
+                        <span>Total</span>
+                        <span id="displayTotal">₹0</span>
+                    </div>
+                </div>
+
+                <div class="booking-footer" style="display: flex; justify-content: space-between; align-items: center;">
+                    <a href="javascript:history.back()" class="btn-back">← Back</a>
+                    <button type="submit" class="btn-place-order" style="background: #00A676; color: white; border: none; padding: 12px 40px; border-radius: 50px; font-weight: 700; cursor: pointer;">Place Order →</button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        // LOGIC TO AUTO-FILL DATA FROM URL
+        document.addEventListener('DOMContentLoaded', () => {
+    // 1. Get data from the URL
+    const params = new URLSearchParams(window.location.search);
+    const service = params.get('service') || "General Cleaning";
+    const price = params.get('price') || "0";
+    
+    // 2. Get the City-Specific WhatsApp Number
+    // Replace '910000000000' with your main office number as a backup
+    const cityNumber = params.get('number') || "917828597277";
+
+    // 3. Update the UI Summary
+    document.getElementById('displayService').innerText = service;
+    document.getElementById('displayPrice').innerText = "₹" + price;
+    document.getElementById('displayTotal').innerText = "₹" + price;
+
+    // 4. Handle Form Submission
+    document.getElementById('finalBookingForm').onsubmit = (e) => {
+        e.preventDefault();
+
+        // Collect Form Data
+        const name = document.getElementById('userName').value;
+        const phone = document.getElementById('userPhone').value;
+        const address = document.getElementById('userAddress').value;
+        const date = document.getElementById('prefDate').value;
+        const slot = document.getElementById('prefSlot').value;
+
+        // Construct the WhatsApp message
+        const msg = `*New DirtFree Booking*%0A%0A` +
+                    `*Service:* ${service}%0A` +
+                    `*Name:* ${name}%0A` +
+                    `*Phone:* +91 ${phone}%0A` +
+                    `*Address:* ${address}%0A` +
+                    `*Date:* ${date}%0A` +
+                    `*Slot:* ${slot}%0A` +
+                    `*Total:* ₹${price}`;
+
+        // Open WhatsApp with the dynamic city number
+        window.open(`https://wa.me/${cityNumber}?text=${msg}`, '_blank');
+    };
+});
+
+document.getElementById('finalBookingForm').onsubmit = function(e) {
+    e.preventDefault();
+
+    // 1. Collect the data from your fields
+    const name = document.getElementById('userName').value;
+    const phone = document.getElementById('userPhone').value;
+    const address = document.getElementById('userAddress').value;
+    const date = document.getElementById('prefDate').value;
+    const slot = document.getElementById('prefSlot').value;
+    const service = document.getElementById('displayService').innerText;
+    const total = document.getElementById('displayTotal').innerText;
+
+    // 2. Prepare the data exactly like the manual test that worked
+    const params = new URLSearchParams();
+    params.append('name', name);
+    params.append('phone', phone);
+    params.append('address', address);
+    params.append('date', date);
+    params.append('slot', slot);
+    params.append('service', service);
+    params.append('total', total);
+
+    // 3. Send to Google Sheets
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbyLT_KKbmiKTGkGH68Y8SMtZBTCZN_ZW2UtP0K7mJoieAFonc0BAoHo9i6Ytr573JhB/exec'; // Make sure this is the Version 3+ URL
+
+    fetch(scriptURL, {
+        method: 'POST',
+        mode: 'no-cors', // This is important for Google Apps Script
+        body: params
+    })
+    .then(() => {
+        console.log("Data sent to Sheet!");
+    })
+    .catch((error) => {
+        console.error("Error!", error.message);
+    });
+
+    // 4. Construct WhatsApp Message and Redirect
+    // Get the dynamic number from the URL like we did before
+    const urlParams = new URLSearchParams(window.location.search);
+    const cityNumber = urlParams.get('number') || "91XXXXXXXXXX"; 
+
+    const msg = `*New DirtFree Booking*%0A%0A` +
+                `*Service:* ${service}%0A` +
+                `*Name:* ${name}%0A` +
+                `*Phone:* +91 ${phone}%0A` +
+                `*Address:* ${address}%0A` +
+                `*Date:* ${date}%0A` +
+                `*Slot:* ${slot}%0A` +
+                `*Total:* ${total}`;
+
+    window.open(`https://wa.me/${cityNumber}?text=${msg}`, '_blank');
+};
+    </script>
+</body>
+</html>
