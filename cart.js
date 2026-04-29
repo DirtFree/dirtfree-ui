@@ -70,23 +70,27 @@ class CartManager {
 
       .cart-badge {
         position: absolute;
-        top: -8px;
-        right: -8px;
-        background: #e74c3c;
+        top: -7px;
+        right: -7px;
+        background: linear-gradient(135deg, #ef4444, #f97316);
         color: white;
         border-radius: 50%;
-        width: 24px;
-        height: 24px;
-        display: none;
+        min-width: 22px;
+        height: 22px;
+        padding: 0 6px;
+        display: none !important;
         align-items: center;
         justify-content: center;
-        font-size: 11px;
-        font-weight: 700;
+        font-size: 10px;
+        line-height: 1;
+        font-weight: 800;
         z-index: 999;
+        border: 2px solid #ffffff;
+        box-shadow: 0 8px 18px rgba(239, 68, 68, 0.28);
       }
 
       .cart-badge.show {
-        display: flex;
+        display: flex !important;
       }
 
       /* Improved button styling for responsive */
@@ -210,20 +214,61 @@ const cart = window.cart;
 
 // Update button state on page load
 document.addEventListener('DOMContentLoaded', function() {
+  initMobileNavbar();
   cart.updateBookNowButton();
   updateCartBadge();
 });
 
+function initMobileNavbar() {
+  const header = document.querySelector('.main-header');
+  const headerContainer = document.querySelector('.header-container');
+  const navMenu = document.querySelector('.nav-menu');
+
+  if (!header || !headerContainer || !navMenu || document.querySelector('.nav-toggle')) return;
+
+  const toggle = document.createElement('button');
+  toggle.className = 'nav-toggle';
+  toggle.type = 'button';
+  toggle.setAttribute('aria-label', 'Open navigation menu');
+  toggle.setAttribute('aria-expanded', 'false');
+  toggle.innerHTML = '<span></span><span></span><span></span>';
+
+  headerContainer.insertBefore(toggle, navMenu);
+
+  toggle.addEventListener('click', () => {
+    const isOpen = header.classList.toggle('nav-open');
+    toggle.setAttribute('aria-expanded', String(isOpen));
+    toggle.setAttribute('aria-label', isOpen ? 'Close navigation menu' : 'Open navigation menu');
+  });
+
+  navMenu.addEventListener('click', (event) => {
+    if (event.target.closest('a')) {
+      header.classList.remove('nav-open');
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.setAttribute('aria-label', 'Open navigation menu');
+    }
+  });
+}
+
 // Update cart badge count
 function updateCartBadge() {
+  const cartButtons = document.querySelectorAll('.book-now-btn, .nav-menu .card-btn[href*="booking"]');
+  cartButtons.forEach(btn => {
+    if (!btn.querySelector('.cart-badge')) {
+      const badge = document.createElement('span');
+      badge.className = 'cart-badge';
+      btn.appendChild(badge);
+    }
+  });
+
   const badges = document.querySelectorAll('.cart-badge');
   const count = cart.getCartCount();
   badges.forEach(badge => {
     if (count > 0) {
       badge.textContent = count;
-      badge.style.display = 'inline-block';
+      badge.classList.add('show');
     } else {
-      badge.style.display = 'none';
+      badge.classList.remove('show');
     }
   });
 }

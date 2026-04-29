@@ -208,7 +208,9 @@ function renderTiers(serviceName) {
       <div class="cat-tier-action">
         <div class="cat-tier-image-wrapper">
           <img src="${tier.image}" alt="${tier.name}" class="cat-tier-image">
-          <button class="cat-add-btn" onclick="addToCart('${tier.name}', ${tier.price})">Add</button>
+          <div class="cat-cart-control" data-tier="${tier.name}">
+            <button class="cat-add-btn" data-tier="${tier.name}" onclick="addToCart('${tier.name}', ${tier.price})">Add</button>
+          </div>
         </div>
       </div>
     </div>
@@ -229,6 +231,7 @@ function attachServiceListeners(containerId) {
       const serviceName = this.dataset.service;
       mainTitle.textContent = serviceName;
       tierList.innerHTML = renderTiers(serviceName);
+      updateCartDisplay();
     });
   });
 }
@@ -265,61 +268,110 @@ function addToCart(tierName, price) {
     updateCartBadge();
     updateCartDisplay();
     
-    // Show success message
-    showNotification(`✓ ${tierName} added to cart!`, 'success');
+    showNotification(`${tierName} added to cart`, 'success');
   } else {
-    alert(`Added "${tierName}" (₹${price}) to cart!`);
+    showNotification(`${tierName} added to cart`, 'success');
   }
 }
 
-// Notification function
+// Snackbar notification function
 function showNotification(message, type = 'info') {
-  const notification = document.createElement('div');
-  notification.className = `notification notification-${type}`;
-  notification.textContent = message;
-  notification.style.cssText = `
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: ${type === 'success' ? '#4CAF50' : '#2196F3'};
-    color: white;
-    padding: 16px 24px;
-    border-radius: 8px;
-    font-weight: 600;
-    z-index: 10000;
-    animation: slideIn 0.3s ease;
-  `;
-  
-  document.body.appendChild(notification);
-  
-  setTimeout(() => {
-    notification.style.animation = 'slideOut 0.3s ease';
-    setTimeout(() => notification.remove(), 300);
-  }, 2500);
+  let snackbar = document.getElementById('cartSnackbar');
+
+  if (!snackbar) {
+    snackbar = document.createElement('div');
+    snackbar.id = 'cartSnackbar';
+    snackbar.innerHTML = `
+      <span class="snackbar-status"></span>
+      <span class="snackbar-message"></span>
+      <a class="snackbar-action" href="booking.html">View cart</a>
+    `;
+    document.body.appendChild(snackbar);
+  }
+
+  snackbar.className = `cart-snackbar cart-snackbar-${type}`;
+  snackbar.querySelector('.snackbar-status').textContent = type === 'success' ? 'Added' : 'Notice';
+  snackbar.querySelector('.snackbar-message').textContent = message;
+
+  window.clearTimeout(snackbar.hideTimer);
+  snackbar.classList.add('show');
+
+  snackbar.hideTimer = window.setTimeout(() => {
+    snackbar.classList.remove('show');
+  }, 2800);
 }
 
-// Add animation styles
+// Add snackbar styles
 const style = document.createElement('style');
 style.textContent = `
-  @keyframes slideIn {
-    from {
-      transform: translateX(400px);
-      opacity: 0;
-    }
-    to {
-      transform: translateX(0);
-      opacity: 1;
-    }
+  .cart-snackbar {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    transform: translate(-50%, 120%);
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+    width: min(92vw, 520px);
+    padding: 14px 16px;
+    border: 1px solid rgba(148, 163, 184, 0.24);
+    border-radius: 14px;
+    background: rgba(15, 23, 42, 0.94);
+    color: #ffffff;
+    box-shadow: 0 18px 42px rgba(15, 23, 42, 0.28);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 10000;
+    transition: transform 0.26s ease, opacity 0.26s ease;
   }
-  
-  @keyframes slideOut {
-    from {
-      transform: translateX(0);
-      opacity: 1;
+
+  .cart-snackbar.show {
+    transform: translate(-50%, 0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .snackbar-status {
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #10b981, #06b6d4);
+    font-size: 12px;
+    font-weight: 800;
+    color: #ffffff;
+  }
+
+  .snackbar-message {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .snackbar-action {
+    color: #93c5fd;
+    font-size: 13px;
+    font-weight: 800;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .snackbar-action:hover {
+    color: #ffffff;
+  }
+
+  @media (max-width: 560px) {
+    .cart-snackbar {
+      bottom: 16px;
+      grid-template-columns: 1fr auto;
     }
-    to {
-      transform: translateX(400px);
-      opacity: 0;
+
+    .snackbar-status {
+      display: none;
     }
   }
 `;
@@ -338,8 +390,8 @@ function updateCartDisplay() {
     const totalCount = cart.getCartCount();
     const totalPrice = cart.getCartTotal();
     
-    countBadge.textContent = totalCount;
-    totalAmount.textContent = '₹' + totalPrice;
+    if (countBadge) countBadge.textContent = totalCount;
+    if (totalAmount) totalAmount.textContent = '₹' + totalPrice;
     
     if (cartItems.length === 0) {
       cartDisplay.innerHTML = '<p class="empty-cart-text">No items yet</p>';
@@ -355,7 +407,62 @@ function updateCartDisplay() {
         </div>
       `).join('');
     }
+
+    updateAddButtonCounts(cartItems);
   }
+}
+
+function updateAddButtonCounts(cartItems = null) {
+  if (typeof cart === 'undefined') return;
+
+  const items = cartItems || cart.getCart();
+  const serviceName = document.querySelector('.cat-main-title')?.textContent || '';
+  const cartControls = document.querySelectorAll('.cat-cart-control[data-tier]');
+
+  cartControls.forEach(control => {
+    const tierName = control.dataset.tier;
+    const matchingItem = items.find(item => item.service === serviceName && item.tier === tierName);
+
+    if (matchingItem) {
+      control.innerHTML = `
+        <button class="cat-qty-btn" type="button" aria-label="Decrease ${tierName}" onclick="decreaseCartItem(${matchingItem.id})">-</button>
+        <span class="cat-qty-count">${matchingItem.quantity}</span>
+        <button class="cat-qty-btn" type="button" aria-label="Increase ${tierName}" onclick="increaseCartItem(${matchingItem.id})">+</button>
+      `;
+      control.classList.add('has-items');
+    } else {
+      const tier = SERVICES_DATA[serviceName]?.tiers.find(item => item.name === tierName);
+      control.innerHTML = `<button class="cat-add-btn" data-tier="${tierName}" onclick="addToCart('${tierName}', ${tier?.price || 0})">Add</button>`;
+      control.classList.remove('has-items');
+    }
+  });
+}
+
+function increaseCartItem(itemId) {
+  if (typeof cart === 'undefined') return;
+
+  const item = cart.getCart().find(cartItem => cartItem.id === itemId);
+  if (!item) return;
+
+  cart.updateQuantity(itemId, item.quantity + 1);
+  updateCartDisplay();
+  updateCartBadge();
+}
+
+function decreaseCartItem(itemId) {
+  if (typeof cart === 'undefined') return;
+
+  const item = cart.getCart().find(cartItem => cartItem.id === itemId);
+  if (!item) return;
+
+  if (item.quantity <= 1) {
+    cart.removeFromCart(itemId);
+  } else {
+    cart.updateQuantity(itemId, item.quantity - 1);
+  }
+
+  updateCartDisplay();
+  updateCartBadge();
 }
 
 // Remove item from cart in mini display
