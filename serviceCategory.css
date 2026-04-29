@@ -865,3 +865,397 @@
   border-left: 1px solid rgba(148, 163, 184, 0.22);
   border-right: 1px solid rgba(148, 163, 184, 0.22);
 }
+
+body.cat-modal-open {
+  overflow: hidden;
+}
+
+.cat-section {
+  background: #f8fafc;
+}
+
+.cat-layout {
+  align-items: start;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  gap: 28px;
+}
+
+.cat-main {
+  padding: 0;
+}
+
+.cat-main-title {
+  margin-bottom: 26px;
+  font-size: 38px;
+  font-weight: 700;
+  color: #0f2748;
+  background: none;
+  -webkit-text-fill-color: initial;
+}
+
+.cat-tier-list {
+  gap: 24px;
+}
+
+.cat-tier-card {
+  grid-template-columns: minmax(0, 1fr) 160px;
+  align-items: start;
+  gap: 28px;
+  padding: 28px;
+  border: 1px solid #d6e4f0;
+  border-radius: 22px;
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+}
+
+.cat-tier-card:hover {
+  transform: none;
+  border-color: #c8d9e6;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+}
+
+.cat-tier-info {
+  align-items: flex-start;
+}
+
+.cat-tier-badge {
+  margin-bottom: 14px;
+}
+
+.cat-badge-bestseller {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #8b5cf6;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.cat-tier-name {
+  margin-bottom: 10px;
+  font-size: 19px;
+  font-weight: 700;
+  color: #11284a;
+}
+
+.cat-tier-rating {
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.cat-rating-stars {
+  background: none;
+  -webkit-text-fill-color: initial;
+  color: #1f9d84;
+  font-weight: 600;
+}
+
+.cat-rating-count {
+  padding: 0;
+  background: transparent;
+  color: #7d93b2;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.cat-tier-price-row {
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.cat-tier-price {
+  font-size: 18px;
+  font-weight: 700;
+  color: #11284a;
+  background: none;
+  -webkit-text-fill-color: initial;
+}
+
+.cat-tier-duration {
+  padding: 0;
+  background: transparent;
+  color: #7d93b2;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.cat-tier-features {
+  margin-bottom: 16px;
+  max-width: 540px;
+  font-size: 15px;
+  line-height: 1.7;
+  color: #243b5a;
+}
+
+.cat-tier-details-btn {
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: #17a589;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.cat-tier-details-btn:hover {
+  transform: none;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  color: #10836c;
+}
+
+.cat-tier-action {
+  justify-content: flex-end;
+}
+
+.cat-tier-image-wrapper {
+  width: 128px;
+  height: 126px;
+}
+
+.cat-tier-image {
+  border-radius: 14px;
+}
+
+.cat-cart-control {
+  right: 18px;
+  bottom: -18px;
+}
+
+.cat-add-btn {
+  position: static;
+  min-width: 112px;
+  padding: 10px 24px;
+  border: 2px solid #2ab39a;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 6px 14px rgba(42, 179, 154, 0.14);
+  color: #1c9f86;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.cat-add-btn:hover {
+  background: #f5fffc;
+  color: #16846f;
+  box-shadow: 0 10px 18px rgba(42, 179, 154, 0.18);
+}
+
+.cat-cart-control.has-items {
+  right: 6px;
+  bottom: -18px;
+  border-radius: 14px;
+  border: 2px solid #2ab39a;
+  background: #ffffff;
+  box-shadow: 0 6px 14px rgba(42, 179, 154, 0.14);
+}
+
+.cat-qty-btn,
+.cat-qty-count {
+  width: 36px;
+  height: 42px;
+}
+
+.cat-qty-btn {
+  color: #1c9f86;
+}
+
+.cat-qty-btn:hover {
+  background: #f1fffb;
+  color: #16846f;
+}
+
+.cat-right-sidebar {
+  gap: 18px;
+}
+
+.cart-info-card,
+.cat-trust-card {
+  border: 1px solid #d6e4f0;
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+}
+
+.cat-trust-header {
+  margin-bottom: 14px;
+}
+
+.cat-trust-seal {
+  font-size: 12px;
+  font-weight: 700;
+  color: #19a085;
+}
+
+.cat-trust-list li {
+  font-size: 13px;
+  color: #304765;
+}
+
+.cat-trust-check {
+  color: #19a085;
+}
+
+.cat-details-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10020;
+  display: none;
+}
+
+.cat-details-modal.is-open {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.cat-details-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.42);
+}
+
+.cat-details-dialog {
+  position: relative;
+  width: min(92vw, 380px);
+  max-height: calc(100vh - 32px);
+  margin: 0;
+  padding: 20px 18px 22px;
+  overflow-y: auto;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 24px 48px rgba(15, 23, 42, 0.2);
+}
+
+.cat-details-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  border: none;
+  background: transparent;
+  color: #1f2937;
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.cat-details-title {
+  margin: 0 32px 6px 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: #1f2e43;
+}
+
+.cat-details-summary {
+  margin: 0 0 18px;
+  color: #7b8797;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.cat-details-section + .cat-details-section {
+  margin-top: 16px;
+}
+
+.cat-details-section-title {
+  margin: 0 0 10px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.cat-details-section-title-included {
+  color: #16a34a;
+}
+
+.cat-details-section-title-excluded {
+  color: #dc2626;
+}
+
+.cat-details-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 10px;
+}
+
+.cat-details-list li {
+  position: relative;
+  padding-left: 18px;
+  color: #334155;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.cat-details-list li::before {
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-weight: 700;
+}
+
+#catDetailsIncluded li::before {
+  content: "✓";
+  color: #16a34a;
+}
+
+#catDetailsExcluded li::before {
+  content: "✕";
+  color: #dc2626;
+}
+
+@media (max-width: 1024px) {
+  .cat-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .cat-right-sidebar {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 768px) {
+  .cat-main-title {
+    font-size: 30px;
+  }
+
+  .cat-tier-card {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    padding: 22px 18px 34px;
+  }
+
+  .cat-tier-action {
+    justify-content: flex-start;
+  }
+
+  .cat-tier-image-wrapper {
+    width: 114px;
+    height: 112px;
+  }
+
+  .cat-details-dialog {
+    width: min(94vw, 380px);
+    margin: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .cat-main-title {
+    font-size: 24px;
+  }
+
+  .cat-tier-features {
+    font-size: 14px;
+  }
+
+  .cat-add-btn {
+    min-width: 96px;
+    font-size: 16px;
+  }
+}

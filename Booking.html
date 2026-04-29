@@ -496,6 +496,36 @@
             document.getElementById('cartTotalAmount').textContent = `₹${cart.getCartTotal()}`;
         }
 
+        function buildCartSummary(cartItems) {
+            return cartItems.map((item) => {
+                const itemTotal = item.price * item.quantity;
+                return `${item.tier} (${item.quantity}x Rs.${item.price}) = Rs.${itemTotal}`;
+            }).join('\n');
+        }
+
+        function saveOrderBackup(orderData) {
+            const storageKey = 'dirtfree_order_history';
+            const existingOrders = JSON.parse(localStorage.getItem(storageKey) || '[]');
+            existingOrders.push(orderData);
+            localStorage.setItem(storageKey, JSON.stringify(existingOrders));
+        }
+
+        async function submitOrderToSheet(orderData) {
+            const params = new URLSearchParams();
+
+            Object.entries(orderData).forEach(([key, value]) => {
+                params.append(key, typeof value === 'string' ? value : JSON.stringify(value));
+            });
+
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbyLT_KKbmiKTGkGH68Y8SMtZBTCZN_ZW2UtP0K7mJoieAFonc0BAoHo9i6Ytr573JhB/exec';
+
+            await fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: params
+            });
+        }
+
         // Handle form submission
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('finalBookingForm');
@@ -504,7 +534,7 @@
             renderBookingLocation();
             renderCartPreview();
 
-            form.addEventListener('submit', function(e) {
+            form.addEventListener('submit', async function(e) {
                 e.preventDefault();
 
                 const location = cart.getLocation();
@@ -528,13 +558,12 @@
 
                 // Get cart items
                 const cartItems = cart.getCart();
-                let cartSummary = '';
-                cartItems.forEach(item => {
-                    const itemTotal = item.price * item.quantity;
-                    cartSummary += `${item.tier} (${item.quantity}x ₹${item.price}) = ₹${itemTotal}%0A`;
-                });
+                const cartSummary = buildCartSummary(cartItems);
+
 
                 const totalAmount = cart.getCartTotal();
+                const orderId = `DF-${Date.now()}`;
+                const bookingTimestamp = new Date().toISOString();
                 const locationMap = {
                     'Ahmedabad': '917828597277',
                     'Betul': '917828597277',
@@ -547,6 +576,8 @@
 
                 // Prepare data for Google Sheets
                 const params = new URLSearchParams();
+                params.append('orderId', orderId);
+                params.append('bookingTimestamp', bookingTimestamp);
                 params.append('name', name);
                 params.append('phone', phone);
                 params.append('address', address);
@@ -557,33 +588,34 @@
                 params.append('cartItems', cartSummary);
 
                 // Send to Google Sheets
-                const scriptURL = 'https://script.google.com/macros/s/AKfycbyLT_KKbmiKTGkGH68Y8SMtZBTCZN_ZW2UtP0K7mJoieAFonc0BAoHo9i6Ytr573JhB/exec';
+                const scriptURL = 'https://script.google.com/macros/s/AKfycbz0k4TK7-9LwCLrGzjfBVAnatvTqDL2MKGjLcvHlZyiWPRHMPzxtMq2yNyXdP6emCAC/exec';
 
                 fetch(scriptURL, {
                     method: 'POST',
-                    mode: 'no-cors',
                     body: params
                 })
-                .then(() => {
-                    console.log("Data sent to Sheet!");
+                    .then(res => res.text())
+                    .then(data => {
+                     console.log("Response:", data);
                 })
-                .catch((error) => {
-                    console.error("Error!", error.message);
+                    .catch(err => {
+                    console.error("Error:", err);
                 });
 
                 // Construct WhatsApp message
-                const msg = `*New DirtFree Booking*%0A%0A` +
-                            `*Location:* ${location}%0A` +
-                            `*Name:* ${name}%0A` +
-                            `*Phone:* +91 ${phone}%0A` +
-                            `*Address:* ${address}%0A` +
-                            `*Date:* ${date}%0A` +
-                            `*Time Slot:* ${slot}%0A%0A` +
-                            `*Cart Items:*%0A${cartSummary}%0A` +
-                            `*Total:* ₹${totalAmount}`;
+                const msg = `*New DirtFree Booking*\n\n` +
+                            `*Order ID:* ${orderId}\n` +
+                            `*Location:* ${location}\n` +
+                            `*Name:* ${name}\n` +
+                            `*Phone:* +91 ${phone}\n` +
+                            `*Address:* ${address}\n` +
+                            `*Date:* ${date}\n` +
+                            `*Time Slot:* ${slot}\n\n` +
+                            `*Cart Items:*\n${cartSummary}\n` +
+                            `*Total:* Rs.${totalAmount}`;
 
                 // Open WhatsApp
-                window.open(`https://wa.me/${cityNumber}?text=${msg}`, '_blank');
+                window.open(`https://wa.me/${cityNumber}?text=${encodeURIComponent(msg)}`, '_blank');
 
                 // Clear cart after successful order
                 setTimeout(() => {
@@ -641,3 +673,4 @@
     </footer>
 </body>
 </html>
+

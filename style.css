@@ -1523,7 +1523,7 @@ body {
     color: #ffffff;
     box-shadow: 0 12px 24px rgba(37, 99, 235, 0.26);
     position: relative;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .nav-toggle {

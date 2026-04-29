@@ -70,8 +70,9 @@ class CartManager {
 
       .cart-badge {
         position: absolute;
-        top: -7px;
-        right: -7px;
+        top: 0;
+        right: 0;
+        transform: translate(38%, -38%);
         background: linear-gradient(135deg, #ef4444, #f97316);
         color: white;
         border-radius: 50%;
