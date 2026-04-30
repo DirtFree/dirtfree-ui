@@ -1194,6 +1194,7 @@ body {
 
 .hero-overlay {
     background: linear-gradient(90deg, rgba(16, 24, 40, 0.74) 0%, rgba(16, 24, 40, 0.48) 50%, rgba(16, 24, 40, 0.22) 100%);
+    pointer-events: none;
 }
 
 .badge,
