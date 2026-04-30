@@ -6,11 +6,11 @@ export default defineConfig({
       input: {
         main: 'index.html',
         ahmedabad: 'ahmedabad.html',
-        betul: 'Betul.html',
-        booking: 'Booking.html',
-        chennai: 'Chennai.html',
-        ghaziabad: 'Ghaziabad.html',
-        indore: 'Indore.html',
+        betul: 'betul.html',
+        booking: 'booking.html',
+        chennai: 'chennai.html',
+        ghaziabad: 'ghaziabad.html',
+        indore: 'indore.html',
         service: 'service.html'
       }
     }
