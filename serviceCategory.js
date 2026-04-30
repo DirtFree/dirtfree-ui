@@ -193,7 +193,7 @@ const SERVICES_DATA = {
     tiers: [
       {
         name: 'Car Interior & Exterior Cleaning',
-        price: 599,
+        price: 999,
         duration: '1-2 hours',
         rating: 4.7,
         reviews: '856',
@@ -220,8 +220,8 @@ const SERVICES_DATA = {
     title: 'Water Tank Cleaning',
     tiers: [
       {
-        name: 'Professional Water Tank Cleaning',
-        price: 799,
+        name: 'Professional Water Tank Cleaning (500L-1000L)',
+        price:  '599',
         duration: '2-4 hours',
         rating: 4.8,
         reviews: '743',
