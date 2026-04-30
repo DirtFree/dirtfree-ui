@@ -315,7 +315,6 @@ function initServiceCategory(containerId, selectedService = null) {
             <div class="cat-trust-card">
               <div class="cat-trust-header">
                 <h4>DirtFree Promise</h4>
-                <div class="cat-trust-seal">OK</div>
               </div>
               <ul class="cat-trust-list">
                 <li><span class="cat-trust-check">+</span>Verified Professionals</li>

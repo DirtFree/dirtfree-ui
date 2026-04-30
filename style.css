@@ -71,6 +71,20 @@ body {
     cursor: pointer;
 }
 
+.logo::before {
+    content: "";
+    display: block;
+    width: 156px;
+    height: 54px;
+    background: url("/dirtfree-logo.svg") center / contain no-repeat;
+    flex-shrink: 0;
+}
+
+.logo-img,
+.brand-name {
+    display: none;
+}
+
 .brand-name {
     font-size: 1.5rem;
     font-weight: 800;
@@ -1981,6 +1995,15 @@ textarea:focus {
     text-decoration: none;
 }
 
+.footer-brand::before {
+    content: "";
+    display: block;
+    width: 172px;
+    height: 60px;
+    background: url("/dirtfree-logo.svg") center / contain no-repeat;
+    flex-shrink: 0;
+}
+
 .footer-logo-mark {
     width: 44px;
     height: 44px;
@@ -2156,4 +2179,21 @@ textarea:focus {
 .reviews-header h2,
 .faq-header h2 {
     color: #0b1220;
+}
+
+.logo-img,
+.brand-name,
+.footer-logo-mark,
+.footer-brand-name {
+    display: none !important;
+}
+
+.logo::before {
+    width: clamp(132px, 17vw, 156px);
+    height: clamp(45px, 5.8vw, 54px);
+}
+
+.footer-brand::before {
+    width: min(172px, 100%);
+    height: 60px;
 }
