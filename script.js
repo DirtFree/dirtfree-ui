@@ -235,14 +235,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Generic Navigation Function ---
     const getCityPage = (cityName) => {
         const cityPages = {
-            Ahmedabad: "ahmedabad.html",
+            Ahmedabad: "Ahmedabad.html",
             Betul: "Betul.html",
             Chennai: "Chennai.html",
             Ghaziabad: "Ghaziabad.html",
             Indore: "Indore.html"
         };
 
-        return cityPages[cityName] || cityName.toLowerCase().trim() + ".html";
+        return cityPages[cityName] || cityName + ".html";
     };
 
     const getCityNameFromUrl = (url) => {
