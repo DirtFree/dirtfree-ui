@@ -1,7 +1,18 @@
 import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
 
-// https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  build: {
+    rollupOptions: {
+      input: {
+        main: 'index.html',
+        ahmedabad: 'ahmedabad.html',
+        betul: 'Betul.html',
+        booking: 'Booking.html',
+        chennai: 'Chennai.html',
+        ghaziabad: 'Ghaziabad.html',
+        indore: 'Indore.html',
+        service: 'service.html'
+      }
+    }
+  }
 })
