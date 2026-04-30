@@ -226,6 +226,7 @@ function initMobileNavbar() {
   const navMenu = document.querySelector('.nav-menu');
 
   if (!header || !headerContainer || !navMenu || document.querySelector('.nav-toggle')) return;
+  if (document.body.classList.contains('service-page')) return;
 
   const toggle = document.createElement('button');
   toggle.className = 'nav-toggle';

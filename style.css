@@ -1864,6 +1864,33 @@ textarea:focus {
         margin-left: auto;
     }
 
+    .service-page .nav-toggle {
+        display: none;
+    }
+
+    .service-page .nav-menu {
+        position: static;
+        display: flex;
+        width: auto;
+        margin-left: auto;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+        opacity: 1;
+        pointer-events: auto;
+        transform: none;
+        transition: none;
+    }
+
+    .service-page .nav-menu .card-btn {
+        width: auto;
+        min-height: 40px;
+        padding: 0 16px;
+        white-space: nowrap;
+    }
+
     .city-picker {
         width: 100%;
     }

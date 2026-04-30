@@ -426,9 +426,9 @@
                             <label>Preferred Time Slot *</label>
                             <select id="prefSlot" required>
                                 <option value="">Select a slot</option>
-                                <option>Morning (9 AM - 12 PM)</option>
-                                <option>Afternoon (1 PM - 4 PM)</option>
-                                <option>Evening (5 PM - 8 PM)</option>
+                                <option value="Morning (9 AM - 12 PM)" data-start-hour="9">Morning (9 AM - 12 PM)</option>
+                                <option value="Afternoon (1 PM - 4 PM)" data-start-hour="13">Afternoon (1 PM - 4 PM)</option>
+                                <option value="Evening (5 PM - 8 PM)" data-start-hour="17">Evening (5 PM - 8 PM)</option>
                             </select>
                         </div>
                     </div>
@@ -510,6 +510,78 @@
             localStorage.setItem(storageKey, JSON.stringify(existingOrders));
         }
 
+        function getLocalDateValue(date = new Date()) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function setupBookingAvailability() {
+            const dateInput = document.getElementById('prefDate');
+            const slotSelect = document.getElementById('prefSlot');
+            const todayValue = getLocalDateValue();
+
+            dateInput.min = todayValue;
+            if (!dateInput.value || dateInput.value < todayValue) {
+                dateInput.value = todayValue;
+            }
+
+            function updateAvailableSlots() {
+                const currentTodayValue = getLocalDateValue();
+                dateInput.min = currentTodayValue;
+
+                if (dateInput.value && dateInput.value < currentTodayValue) {
+                    dateInput.value = currentTodayValue;
+                }
+
+                const selectedDate = dateInput.value;
+                const now = new Date();
+                const isToday = selectedDate === currentTodayValue;
+
+                Array.from(slotSelect.options).forEach((option) => {
+                    if (!option.dataset.startHour) return;
+
+                    const startHour = Number(option.dataset.startHour);
+                    const isPastSlot = isToday && now.getHours() >= startHour;
+                    option.disabled = isPastSlot;
+                    option.textContent = isPastSlot
+                        ? `${option.value} - unavailable today`
+                        : option.value;
+                });
+
+                if (slotSelect.selectedOptions[0]?.disabled) {
+                    slotSelect.value = '';
+                }
+            }
+
+            dateInput.addEventListener('change', updateAvailableSlots);
+            updateAvailableSlots();
+        }
+
+        function validateBookingAvailability() {
+            const dateInput = document.getElementById('prefDate');
+            const slotSelect = document.getElementById('prefSlot');
+            const todayValue = getLocalDateValue();
+
+            if (dateInput.value < todayValue) {
+                alert('Please choose today or a future date.');
+                dateInput.value = todayValue;
+                dateInput.focus();
+                return false;
+            }
+
+            const selectedOption = slotSelect.selectedOptions[0];
+            if (!selectedOption || !selectedOption.value || selectedOption.disabled) {
+                alert('Please choose an available time slot.');
+                slotSelect.value = '';
+                slotSelect.focus();
+                return false;
+            }
+
+            return true;
+        }
+
         async function submitOrderToSheet(orderData) {
             const params = new URLSearchParams();
 
@@ -533,6 +605,7 @@
             // Initial cart preview render
             renderBookingLocation();
             renderCartPreview();
+            setupBookingAvailability();
 
             form.addEventListener('submit', async function(e) {
                 e.preventDefault();
@@ -546,6 +619,10 @@
 
                 if (cart.getCart().length === 0) {
                     alert('Your cart is empty. Please add services first.');
+                    return;
+                }
+
+                if (!validateBookingAvailability()) {
                     return;
                 }
 
