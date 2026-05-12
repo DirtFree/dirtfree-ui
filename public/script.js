@@ -29,6 +29,7 @@ function updateSelectedCityUI(cityName) {
 
 function saveSelectedCity(cityName) {
     localStorage.setItem("selectedCity", cityName);
+    sessionStorage.setItem("dirtfree-location", cityName.toLowerCase());
 
     if (window.cart) {
         window.cart.setLocation(cityName);
@@ -289,13 +290,255 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = fileName;
     };
 
+    const selectCityWithoutRedirect = (cityName) => {
+        if (typeof window.cart === "undefined") {
+            saveSelectedCity(cityName);
+            cityDropdown?.classList.remove('active');
+            return;
+        }
+
+        const currentLocation = window.cart.getLocation();
+        const isSameCity = currentLocation && currentLocation.toLowerCase() === cityName.toLowerCase();
+        const cartItems = window.cart.getCart();
+
+        if (!isSameCity && cartItems.length > 0) {
+            showLocationModal(
+                () => {
+                    window.cart.clearCart();
+                    saveSelectedCity(cityName);
+                    cityDropdown?.classList.remove('active');
+                },
+                () => {}
+            );
+            return;
+        }
+
+        saveSelectedCity(cityName);
+        cityDropdown?.classList.remove('active');
+    };
+
+    const getLocationKey = (cityName) => cityName.trim().toLowerCase();
+
+    const goToServiceForCity = (serviceName, cityName) => {
+        const locationKey = getLocationKey(cityName);
+        saveSelectedCity(cityName);
+        sessionStorage.setItem('dirtfree-location', locationKey);
+
+        const params = new URLSearchParams({
+            service: serviceName,
+            location: locationKey
+        });
+
+        window.location.href = `service.html?${params.toString()}`;
+    };
+
+    const createServiceLocationModal = () => {
+        if (document.getElementById('serviceLocationModal')) return;
+
+        const cities = ['Ahmedabad', 'Betul', 'Chennai', 'Ghaziabad', 'Indore'];
+        const modal = document.createElement('div');
+        modal.id = 'serviceLocationModal';
+        modal.innerHTML = `
+            <div class="service-location-overlay" role="presentation">
+                <div class="service-location-dialog" role="dialog" aria-modal="true" aria-labelledby="serviceLocationTitle">
+                    <button class="service-location-close" type="button" aria-label="Close location selector">x</button>
+                    <div class="service-location-header">
+                        <span class="service-location-kicker">Select location</span>
+                        <h2 id="serviceLocationTitle">Where do you need this service?</h2>
+                        <p id="serviceLocationName"></p>
+                    </div>
+                    <div class="service-location-grid">
+                        ${cities.map((city) => `<button class="service-location-city" type="button" data-city="${city}">${city}</button>`).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        const style = document.createElement('style');
+        style.textContent = `
+            #serviceLocationModal {
+                display: none;
+                position: fixed;
+                inset: 0;
+                z-index: 10020;
+            }
+
+            #serviceLocationModal.active {
+                display: block;
+            }
+
+            .service-location-overlay {
+                min-height: 100%;
+                background: rgba(8, 21, 40, 0.58);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 24px;
+            }
+
+            .service-location-dialog {
+                position: relative;
+                width: min(92vw, 520px);
+                background: #ffffff;
+                border-radius: 16px;
+                box-shadow: 0 24px 70px rgba(8, 21, 40, 0.28);
+                padding: 28px;
+                animation: serviceLocationIn 0.22s ease;
+            }
+
+            @keyframes serviceLocationIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(12px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .service-location-close {
+                position: absolute;
+                top: 14px;
+                right: 14px;
+                width: 34px;
+                height: 34px;
+                border: 1px solid #e5e7eb;
+                border-radius: 50%;
+                background: #ffffff;
+                color: #475569;
+                font-weight: 700;
+                cursor: pointer;
+            }
+
+            .service-location-header {
+                padding-right: 34px;
+                margin-bottom: 22px;
+            }
+
+            .service-location-kicker {
+                display: inline-flex;
+                color: #1663d8;
+                background: rgba(74, 144, 226, 0.12);
+                border: 1px solid rgba(74, 144, 226, 0.18);
+                border-radius: 999px;
+                padding: 5px 13px;
+                font-size: 0.78rem;
+                font-weight: 700;
+                margin-bottom: 12px;
+            }
+
+            .service-location-header h2 {
+                margin: 0;
+                color: #071a33;
+                font-size: 1.55rem;
+                line-height: 1.25;
+            }
+
+            .service-location-header p {
+                margin: 8px 0 0;
+                color: #64748b;
+                font-size: 0.95rem;
+            }
+
+            .service-location-grid {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 12px;
+            }
+
+            .service-location-city {
+                min-height: 48px;
+                border: 1px solid #dbe3ef;
+                border-radius: 10px;
+                background: #f8fafc;
+                color: #10233f;
+                font: inherit;
+                font-weight: 700;
+                cursor: pointer;
+                transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+            }
+
+            .service-location-city:hover,
+            .service-location-city:focus-visible {
+                border-color: #1663d8;
+                background: #eef6ff;
+                transform: translateY(-1px);
+                outline: none;
+            }
+
+            @media (max-width: 520px) {
+                .service-location-dialog {
+                    padding: 24px;
+                }
+
+                .service-location-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    };
+
+    const showServiceLocationModal = (serviceName) => {
+        createServiceLocationModal();
+
+        const modal = document.getElementById('serviceLocationModal');
+        const selectedName = document.getElementById('serviceLocationName');
+        selectedName.textContent = `Selected service: ${serviceName}`;
+        modal.classList.add('active');
+
+        const closeModal = () => modal.classList.remove('active');
+
+        modal.querySelector('.service-location-close').onclick = closeModal;
+        modal.querySelector('.service-location-overlay').onclick = (event) => {
+            if (event.target === event.currentTarget) closeModal();
+        };
+
+        modal.querySelectorAll('.service-location-city').forEach((button) => {
+            button.onclick = () => {
+                const cityName = button.dataset.city;
+                const currentLocation = window.cart?.getLocation();
+                const isSameCity = currentLocation && currentLocation.toLowerCase() === cityName.toLowerCase();
+                const cartItems = window.cart?.getCart ? window.cart.getCart() : [];
+
+                if (!isSameCity && cartItems.length > 0) {
+                    closeModal();
+                    showLocationModal(
+                        () => {
+                            window.cart.clearCart();
+                            goToServiceForCity(serviceName, cityName);
+                        },
+                        () => {}
+                    );
+                    return;
+                }
+
+                goToServiceForCity(serviceName, cityName);
+            };
+        });
+    };
+
+    const openServiceFromCard = (serviceName) => {
+        const selectedCity = getSavedCity();
+
+        if (selectedCity) {
+            goToServiceForCity(serviceName, selectedCity);
+            return;
+        }
+
+        showServiceLocationModal(serviceName);
+    };
+
     // --- 1. Dropdown Selection ---
     const cityItems = document.querySelectorAll('.city-item');
     cityItems.forEach(item => {
         item.addEventListener('click', (e) => {
             e.stopPropagation();
             const cityName = getCityNameFromUrl(item.dataset.url);
-            navigateToCity(cityName);
+            selectCityWithoutRedirect(cityName);
         });
     });
 
@@ -305,6 +548,19 @@ document.addEventListener('DOMContentLoaded', () => {
         button.addEventListener('click', () => {
             const cityName = button.innerText.trim();
             navigateToCity(cityName);
+        });
+    });
+
+    const serviceCards = document.querySelectorAll('.services-grid .service-card[data-service]');
+    serviceCards.forEach((card) => {
+        const openLocationSelector = () => openServiceFromCard(card.dataset.service);
+
+        card.addEventListener('click', openLocationSelector);
+        card.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                openLocationSelector();
+            }
         });
     });
 

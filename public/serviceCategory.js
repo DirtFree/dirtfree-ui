@@ -198,7 +198,7 @@ const SERVICES_DATA = {
         rating: 4.8,
         reviews: '1.2K',
         description: 'Machine-assisted deep cleaning to remove stains, grime, and bacteria for complete sanitation.',
-        image: 'Images/washroom.png',
+        image: 'Images/washroom.jpg',
         badge: 'BESTSELLER',
         detailsSummary: 'Machine-assisted deep bathroom cleaning.',
         included: [
@@ -222,7 +222,7 @@ const SERVICES_DATA = {
         rating: 4.8,
         reviews: '1.2K',
         description: 'Surface cleaning, mopping, mirror cleaning, fixture polishing',
-        image: 'Images/washroom.png',
+        image: 'Images/washroom.jpg',
         detailsSummary: 'Surface-level bathroom cleaning.',
         included: [
           'Surface cleaning of toilet, washbasin and taps',
@@ -249,7 +249,7 @@ const SERVICES_DATA = {
         rating: 4.8,
         reviews: '1.2K',
         description: 'Complete cleaning of kitchen surfaces to remove oil, grease, and dirt, ensuring a clean and hygienic cooking space.',
-        image: 'Images/Kitchen.png',
+        image: 'Images/Kitchen.jpg',
         badge: 'BESTSELLER',
         detailsSummary: 'Deep kitchen cleaning for daily cooking zones.',
         included: [
@@ -273,7 +273,7 @@ const SERVICES_DATA = {
         rating: 4.8,
         reviews: '1.2K',
         description: 'Intensive removal of oil, grease, and food residue from all key modular kitchen surfaces for a hygienic cooking space.',
-        image: 'Images/Kitchen.png',
+        image: 'Images/Kitchen.jpg',
         detailsSummary: 'Detailed modular kitchen cleaning.',
         included: [
           'Deep cleaning of shutters, drawers and shelves',
@@ -301,7 +301,7 @@ const SERVICES_DATA = {
         rating: 4.8,
         reviews: '1.2K',
         description: 'Thorough deep cleaning for unfurnished 1 BHK flats, covering all essential living areas.',
-        image: 'Images/flat.png',
+        image: 'Images/flat.jpg',
         badge: 'BESTSELLER',
         detailsSummary: 'Unfurnished flat deep cleaning.',
         included: [
@@ -328,7 +328,7 @@ const SERVICES_DATA = {
         rating: 4.8,
         reviews: '1.2K',
         description: 'Comprehensive deep cleaning for unfurnished 2 BHK flats, ensuring complete hygiene and freshness.',
-        image: 'Images/flat.png',
+        image: 'Images/flat.jpg',
         detailsSummary: 'Unfurnished flat deep cleaning.',
         included: [
           'Deep cleaning of all rooms, kitchen, bathrooms and balcony',
@@ -354,7 +354,7 @@ const SERVICES_DATA = {
         rating: 4.8,
         reviews: '1.2K',
         description: 'End-to-end deep cleaning for unfurnished 3 BHK flats with detailed attention to every room.',
-        image: 'Images/flat.png',
+        image: 'Images/flat.jpg',
         detailsSummary: 'Unfurnished flat deep cleaning.',
         included: [
           'Deep cleaning of all rooms, kitchen, bathrooms and balcony',
@@ -385,7 +385,7 @@ const SERVICES_DATA = {
         rating: 4.7,
         reviews: '856',
         description: 'Professional interior and exterior car cleaning including seats, carpets, and polish.',
-        image: 'Images/Car.png',
+        image: 'Images/Car.jpg',
         badge: 'POPULAR',
         detailsSummary: 'Interior and exterior car cleaning.',
         included: [
@@ -413,7 +413,7 @@ const SERVICES_DATA = {
         rating: 4.8,
         reviews: '743',
         description: 'Deep cleaning and disinfection of overhead water tanks with professional equipment.',
-        image: 'Images/WT.png',
+        image: 'Images/WT.jpg',
         badge: 'BESTSELLER',
         detailsSummary: 'Water tank deep cleaning.',
         included: [
@@ -558,7 +558,7 @@ function renderTiers(serviceName) {
       </div>
       <div class="cat-tier-action">
         <div class="cat-tier-image-wrapper">
-          <img src="${tier.image}" alt="${tier.name}" class="cat-tier-image">
+          <img src="${tier.image}" alt="${tier.name}" class="cat-tier-image" loading="lazy" decoding="async">
           <div class="cat-cart-control" data-tier="${tier.name}">
             <button class="cat-add-btn" type="button" data-tier="${tier.name}" onclick="addToCart('${tier.name.replace(/'/g, "\\'")}', ${price})">Add</button>
           </div>

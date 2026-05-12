@@ -477,7 +477,7 @@ h1 { font-size: 4rem; margin: 20px 0; line-height: 1.1; }
 .section-subtitle { max-width: 600px; color: var(--text-grey); font-size: 0.9rem; margin: 0 auto; }
 
 .services-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; }
-.service-card { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+.service-card { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer; }
 .card-img {
     width: 100%;           /* Or a specific width like 300px */
     height: 200px;         /* Divs have 0 height by default; you must set one */
@@ -1245,6 +1245,11 @@ body {
 .service-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 16px 36px rgba(74, 144, 226, 0.15);
+}
+
+.service-card:focus-visible {
+    outline: 3px solid rgba(22, 99, 216, 0.32);
+    outline-offset: 4px;
 }
 
 .city-hero {
