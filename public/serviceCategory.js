@@ -1,12 +1,199 @@
 /* global cart, updateCartBadge */
 
+// Location-based rates configuration
+const LOCATION_RATES = {
+  'ghaziabad': {
+    'Washroom Cleaning': {
+      'Deep Washroom Cleaning': 249,
+      'Basic Washroom Cleaning': 99
+    },
+    'Kitchen Cleaning': {
+      'Kitchen Deep Cleaning': 499,
+      'Modular Kitchen Deep Cleaning': 999
+    },
+    'Flat Cleaning': {
+      '1 BHK Flat Cleaning': 799,
+      '2 BHK Flat Cleaning': 1299,
+      '3 BHK Flat Cleaning': 1799
+    },
+    'Car Cleaning': {
+      'Car Interior & Exterior Cleaning': 699
+    },
+    'Water Tank Cleaning': {
+      'Professional Water Tank Cleaning (500L-1000L)': 599
+    }
+  },
+  'ahmedabad': {
+    'Washroom Cleaning': {
+      'Deep Washroom Cleaning': 289,
+      'Basic Washroom Cleaning': 189
+    },
+    'Kitchen Cleaning': {
+      'Kitchen Deep Cleaning': 499,
+      'Modular Kitchen Deep Cleaning': 1199
+    },
+    'Flat Cleaning': {
+      '1 BHK Flat Cleaning': 1499,
+      '2 BHK Flat Cleaning': 2499,
+      '3 BHK Flat Cleaning': 3499
+    },
+    'Car Cleaning': {
+      'Car Interior & Exterior Cleaning': 999
+    },
+    'Water Tank Cleaning': {
+      'Professional Water Tank Cleaning (500L-1000L)': 599
+    }
+  },
+  'chennai': {
+    'Washroom Cleaning': {
+      'Deep Washroom Cleaning': 289,
+      'Basic Washroom Cleaning': 189
+    },
+    'Kitchen Cleaning': {
+      'Kitchen Deep Cleaning': 499,
+      'Modular Kitchen Deep Cleaning': 1199
+    },
+    'Flat Cleaning': {
+      '1 BHK Flat Cleaning': 1499,
+      '2 BHK Flat Cleaning': 2499,
+      '3 BHK Flat Cleaning': 3499
+    },
+    'Car Cleaning': {
+      'Car Interior & Exterior Cleaning': 999
+    },
+    'Water Tank Cleaning': {
+      'Professional Water Tank Cleaning (500L-1000L)': 599
+    }
+  },
+  'indore': {
+    'Washroom Cleaning': {
+      'Deep Washroom Cleaning': 289,
+      'Basic Washroom Cleaning': 189
+    },
+    'Kitchen Cleaning': {
+      'Kitchen Deep Cleaning': 499,
+      'Modular Kitchen Deep Cleaning': 1199
+    },
+    'Flat Cleaning': {
+      '1 BHK Flat Cleaning': 1499,
+      '2 BHK Flat Cleaning': 2499,
+      '3 BHK Flat Cleaning': 3499
+    },
+    'Car Cleaning': {
+      'Car Interior & Exterior Cleaning': 999
+    },
+    'Water Tank Cleaning': {
+      'Professional Water Tank Cleaning (500L-1000L)': 599
+    }
+  },
+  'betul': {
+    'Washroom Cleaning': {
+      'Deep Washroom Cleaning': 289,
+      'Basic Washroom Cleaning': 189
+    },
+    'Kitchen Cleaning': {
+      'Kitchen Deep Cleaning': 499,
+      'Modular Kitchen Deep Cleaning': 1199
+    },
+    'Flat Cleaning': {
+      '1 BHK Flat Cleaning': 1499,
+      '2 BHK Flat Cleaning': 2499,
+      '3 BHK Flat Cleaning': 3499
+    },
+    'Car Cleaning': {
+      'Car Interior & Exterior Cleaning': 999
+    },
+    'Water Tank Cleaning': {
+      'Professional Water Tank Cleaning (500L-1000L)': 599
+    }
+  }
+};
+
+// Get current location from URL, data attribute, or local storage
+function getCurrentLocation() {
+  const validLocations = Object.keys(LOCATION_RATES);
+  
+  // Check URL parameters FIRST (highest priority for service.html)
+  const urlParams = new URLSearchParams(window.location.search);
+  const paramLocation = urlParams.get('location');
+  if (paramLocation && validLocations.includes(paramLocation.toLowerCase())) {
+    const location = paramLocation.toLowerCase();
+    sessionStorage.setItem('dirtfree-location', location);
+    return location;
+  }
+
+  // Check for explicit location data attribute on body or container
+  const bodyLocation = document.body.dataset.location;
+  if (bodyLocation && validLocations.includes(bodyLocation.toLowerCase())) {
+    const location = bodyLocation.toLowerCase();
+    sessionStorage.setItem('dirtfree-location', location);
+    return location;
+  }
+
+  // Detect location from current page filename
+  const pageFile = window.location.pathname.split('/').pop().replace('.html', '').toLowerCase();
+  
+  // Check if pageFile is a valid location
+  if (validLocations.includes(pageFile)) {
+    sessionStorage.setItem('dirtfree-location', pageFile);
+    return pageFile;
+  }
+
+  // Also check the full pathname in case it's in a subdirectory
+  const pathParts = window.location.pathname.split('/').filter(p => p);
+  for (let part of pathParts) {
+    const cleanPart = part.replace('.html', '').toLowerCase();
+    if (validLocations.includes(cleanPart)) {
+      sessionStorage.setItem('dirtfree-location', cleanPart);
+      return cleanPart;
+    }
+  }
+
+  // Check if location is stored in session storage (fallback)
+  const storedLocation = sessionStorage.getItem('dirtfree-location');
+  if (storedLocation && LOCATION_RATES[storedLocation]) {
+    return storedLocation;
+  }
+
+  // Default to first available location if not detected
+  return validLocations[0];
+}
+
+// Set location explicitly and refresh UI
+function setLocation(location) {
+  if (LOCATION_RATES[location]) {
+    sessionStorage.setItem('dirtfree-location', location);
+    // Refresh the service category display with new location
+    refreshServiceData();
+    return true;
+  }
+  return false;
+}
+
+// Refresh service data and prices for current location
+function refreshServiceData() {
+  const container = document.getElementById('service-category-container');
+  if (container) {
+    const currentServiceName = document.querySelector('.cat-main-title')?.dataset.serviceName || null;
+    // Clear and reinitialize to get fresh prices for current location
+    initServiceCategory('service-category-container', currentServiceName);
+  }
+}
+
+// Get price for a specific service and tier in current location
+function getPrice(serviceName, tierName) {
+  const location = getCurrentLocation();
+  const price = LOCATION_RATES[location]?.[serviceName]?.[tierName];
+  return price !== undefined ? price : 0;
+}
+
 const SERVICES_DATA = {
   'Washroom Cleaning': {
     title: 'Bathroom Cleaning',
     tiers: [
       {
         name: 'Deep Washroom Cleaning',
-        price: 289,
+        price: null, // Dynamic price based on location
         duration: '60 mins',
         rating: 4.8,
         reviews: '1.2K',
@@ -30,7 +217,7 @@ const SERVICES_DATA = {
       },
       {
         name: 'Basic Washroom Cleaning',
-        price: 189,
+        price: null, // Dynamic price based on location
         duration: '60 mins',
         rating: 4.8,
         reviews: '1.2K',
@@ -57,7 +244,7 @@ const SERVICES_DATA = {
     tiers: [
       {
         name: 'Kitchen Deep Cleaning',
-        price: 499,
+        price: null, // Dynamic price based on location
         duration: '60 mins',
         rating: 4.8,
         reviews: '1.2K',
@@ -81,7 +268,7 @@ const SERVICES_DATA = {
       },
       {
         name: 'Modular Kitchen Deep Cleaning',
-        price: 1199,
+        price: null, // Dynamic price based on location
         duration: '60 mins',
         rating: 4.8,
         reviews: '1.2K',
@@ -109,7 +296,7 @@ const SERVICES_DATA = {
     tiers: [
       {
         name: '1 BHK Flat Cleaning',
-        price: 1499,
+        price: null, // Dynamic price based on location
         duration: '60 mins',
         rating: 4.8,
         reviews: '1.2K',
@@ -136,7 +323,7 @@ const SERVICES_DATA = {
       },
       {
         name: '2 BHK Flat Cleaning',
-        price: 2499,
+        price: null, // Dynamic price based on location
         duration: '60 mins',
         rating: 4.8,
         reviews: '1.2K',
@@ -162,7 +349,7 @@ const SERVICES_DATA = {
       },
       {
         name: '3 BHK Flat Cleaning',
-        price: 3499,
+        price: null, // Dynamic price based on location
         duration: '60 mins',
         rating: 4.8,
         reviews: '1.2K',
@@ -193,7 +380,7 @@ const SERVICES_DATA = {
     tiers: [
       {
         name: 'Car Interior & Exterior Cleaning',
-        price: 999,
+        price: null, // Dynamic price based on location
         duration: '1-2 hours',
         rating: 4.7,
         reviews: '856',
@@ -221,7 +408,7 @@ const SERVICES_DATA = {
     tiers: [
       {
         name: 'Professional Water Tank Cleaning (500L-1000L)',
-        price:  '599',
+        price: null, // Dynamic price based on location
         duration: '2-4 hours',
         rating: 4.8,
         reviews: '743',
@@ -351,7 +538,9 @@ function initServiceCategory(containerId, selectedService = null) {
 
 function renderTiers(serviceName) {
   const service = SERVICES_DATA[serviceName];
-  return service.tiers.map((tier) => `
+  return service.tiers.map((tier) => {
+    const price = getPrice(serviceName, tier.name);
+    return `
     <div class="cat-tier-card">
       <div class="cat-tier-info">
         ${tier.badge ? `<div class="cat-tier-badge"><span class="cat-badge-bestseller">${tier.badge}</span></div>` : ''}
@@ -361,7 +550,7 @@ function renderTiers(serviceName) {
           <span class="cat-rating-count">(${tier.reviews} reviews)</span>
         </div>
         <div class="cat-tier-price-row">
-          <span class="cat-tier-price">${formatPrice(tier.price)}</span>
+          <span class="cat-tier-price">${formatPrice(price)}</span>
           <span class="cat-tier-duration">&bull; ${tier.duration}</span>
         </div>
         <p class="cat-tier-features">${tier.description}</p>
@@ -371,12 +560,12 @@ function renderTiers(serviceName) {
         <div class="cat-tier-image-wrapper">
           <img src="${tier.image}" alt="${tier.name}" class="cat-tier-image">
           <div class="cat-cart-control" data-tier="${tier.name}">
-            <button class="cat-add-btn" type="button" data-tier="${tier.name}" onclick="addToCart('${tier.name.replace(/'/g, "\\'")}', ${tier.price})">Add</button>
+            <button class="cat-add-btn" type="button" data-tier="${tier.name}" onclick="addToCart('${tier.name.replace(/'/g, "\\'")}', ${price})">Add</button>
           </div>
         </div>
       </div>
     </div>
-  `).join('');
+  `; }).join('');
 }
 
 function attachServiceListeners(containerId) {
@@ -619,8 +808,8 @@ function updateAddButtonCounts(cartItems = null) {
       `;
       control.classList.add('has-items');
     } else {
-      const tier = findTier(serviceName, tierName);
-      control.innerHTML = `<button class="cat-add-btn" type="button" data-tier="${tierName}" onclick="addToCart('${tierName.replace(/'/g, "\\'")}', ${tier?.price || 0})">Add</button>`;
+      const price = getPrice(serviceName, tierName);
+      control.innerHTML = `<button class="cat-add-btn" type="button" data-tier="${tierName}" onclick="addToCart('${tierName.replace(/'/g, "\\'")}', ${price})">Add</button>`;
       control.classList.remove('has-items');
     }
   });
@@ -673,11 +862,23 @@ window.addToCart = addToCart;
 window.increaseCartItem = increaseCartItem;
 window.decreaseCartItem = decreaseCartItem;
 window.removeFromCartMini = removeFromCartMini;
+window.getCurrentLocation = getCurrentLocation;
+window.setLocation = setLocation;
+window.getPrice = getPrice;
+window.refreshServiceData = refreshServiceData;
 
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
+    // Clear cached location only on dedicated location pages with data-location attribute
+    if (document.body.dataset.location) {
+      sessionStorage.removeItem('dirtfree-location');
+    }
     initServiceCategory('service-category-container');
   });
 } else {
+  // Clear cached location only on dedicated location pages with data-location attribute
+  if (document.body.dataset.location) {
+    sessionStorage.removeItem('dirtfree-location');
+  }
   initServiceCategory('service-category-container');
 }

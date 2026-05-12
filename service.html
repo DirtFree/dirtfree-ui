@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Browse Services | DirtFree</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="serviceCategory.css">
@@ -83,14 +85,25 @@
     <script src="/cart.js"></script>
     <script src="/serviceCategory.js"></script>
     <script>
-        // Get service from URL parameter
+        // Get service and location from URL parameters
         function getServiceFromURL() {
             const params = new URLSearchParams(window.location.search);
             return params.get('service') || 'Washroom Cleaning';
         }
 
-        // Initialize component with selected service
+        function getLocationFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('location') || null;
+        }
+
+        // Initialize component with selected service and location
         function initWithService() {
+            // First, set location from URL parameter if provided
+            const location = getLocationFromURL();
+            if (location) {
+                sessionStorage.setItem('dirtfree-location', location);
+            }
+            
             const selectedService = getServiceFromURL();
             initServiceCategory('service-category-container', selectedService);
         }
