@@ -17,7 +17,9 @@ const LOCATION_RATES = {
       '3 BHK Flat Cleaning': 1799
     },
     'Car Cleaning': {
-      'Car Interior & Exterior Cleaning': 699
+      'Cleaning + Exterior Polish': 999,
+      'Cleaning + Interior Polish': 799,
+      'Cleaning + Full': 1699
     },
     'Water Tank Cleaning': {
       'Professional Water Tank Cleaning (500L-1000L)': 599
@@ -38,7 +40,9 @@ const LOCATION_RATES = {
       '3 BHK Flat Cleaning': 3499
     },
     'Car Cleaning': {
-      'Car Interior & Exterior Cleaning': 999
+      'Cleaning + Exterior Polish': 999,
+      'Cleaning + Interior Polish': 799,
+      'Cleaning + Full': 1699
     },
     'Water Tank Cleaning': {
       'Professional Water Tank Cleaning (500L-1000L)': 599
@@ -59,7 +63,9 @@ const LOCATION_RATES = {
       '3 BHK Flat Cleaning': 3499
     },
     'Car Cleaning': {
-      'Car Interior & Exterior Cleaning': 999
+      'Cleaning + Exterior Polish': 999,
+      'Cleaning + Interior Polish': 799,
+      'Cleaning + Full': 1699
     },
     'Water Tank Cleaning': {
       'Professional Water Tank Cleaning (500L-1000L)': 599
@@ -80,7 +86,9 @@ const LOCATION_RATES = {
       '3 BHK Flat Cleaning': 3499
     },
     'Car Cleaning': {
-      'Car Interior & Exterior Cleaning': 999
+      'Cleaning + Exterior Polish': 999,
+      'Cleaning + Interior Polish': 799,
+      'Cleaning + Full': 1699
     },
     'Water Tank Cleaning': {
       'Professional Water Tank Cleaning (500L-1000L)': 599
@@ -101,7 +109,9 @@ const LOCATION_RATES = {
       '3 BHK Flat Cleaning': 3499
     },
     'Car Cleaning': {
-      'Car Interior & Exterior Cleaning': 999
+      'Cleaning + Exterior Polish': 999,
+      'Cleaning + Interior Polish': 799,
+      'Cleaning + Full': 1699
     },
     'Water Tank Cleaning': {
       'Professional Water Tank Cleaning (500L-1000L)': 599
@@ -379,26 +389,78 @@ const SERVICES_DATA = {
     title: 'Car Cleaning',
     tiers: [
       {
-        name: 'Car Interior & Exterior Cleaning',
+        name: 'Cleaning + Exterior Polish',
         price: null, // Dynamic price based on location
-        duration: '1-2 hours',
+        duration: '1 hour',
         rating: 4.7,
         reviews: '856',
-        description: 'Professional interior and exterior car cleaning including seats, carpets, and polish.',
+        description: 'Professional exterior car cleaning with polish for a shiny finish.',
         image: 'Images/Car.jpg',
         badge: 'POPULAR',
-        detailsSummary: 'Interior and exterior car cleaning.',
+        detailsSummary: 'Exterior cleaning and polish.',
+        included: [
+          'Exterior wash and rinse',
+          'Exterior polish for shine',
+          'Tire cleaning',
+          'Windshield cleaning'
+        ],
+        excluded: [
+          'Interior cleaning',
+          'Mechanical servicing',
+          'Scratch repair',
+          'Paint restoration'
+        ]
+      },
+      {
+        name: 'Cleaning + Interior Polish',
+        price: null, // Dynamic price based on location
+        duration: '1 hour',
+        rating: 4.7,
+        reviews: '856',
+        description: 'Professional interior car cleaning with polish for a fresh look.',
+        image: 'Images/Car.jpg',
+        badge: 'BESTSELLER',
+        detailsSummary: 'Interior cleaning and polish.',
         included: [
           'Interior vacuuming',
           'Seat cleaning',
           'Carpet shampooing',
-          'Exterior wash',
-          'Polish finish'
+          'Dashboard polish',
+          'Air freshener'
+        ],
+        excluded: [
+          'Exterior cleaning',
+          'Mechanical servicing',
+          'Scratch repair',
+          'Upholstery repair'
+        ]
+      },
+      {
+        name: 'Cleaning + Full',
+        price: null, // Dynamic price based on location
+        duration: '2 hours',
+        rating: 4.8,
+        reviews: '856',
+        description: 'Comprehensive interior and exterior car cleaning with complete polish finish.',
+        image: 'Images/Car.jpg',
+        badge: 'BESTSELLER',
+        detailsSummary: 'Complete interior and exterior cleaning with polish.',
+        included: [
+          'Exterior wash and rinse',
+          'Exterior polish for shine',
+          'Interior vacuuming',
+          'Seat cleaning',
+          'Carpet shampooing',
+          'Dashboard polish',
+          'Windshield cleaning',
+          'Tire cleaning and dressing',
+          'Air freshener'
         ],
         excluded: [
           'Mechanical servicing',
           'Scratch repair',
-          'Paint restoration'
+          'Paint restoration',
+          'Upholstery repair'
         ]
       }
     ]
@@ -428,6 +490,28 @@ const SERVICES_DATA = {
           'Plumbing replacement',
           'Civil work'
         ]
+      },
+      {
+        name: 'Commercial Water Tank Cleaning',
+        isCustomQuote: true,
+        duration: 'Custom',
+        rating: 4.8,
+        reviews: '743',
+        description: 'Custom commercial water tank cleaning. Share your requirements and our team will reach out for more information.',
+        image: 'Images/WT.jpg',
+        badge: 'CUSTOM',
+        detailsSummary: 'Commercial water tank cleaning planned after consultation.',
+        included: [
+          'Scope of cleaning will be decided after communication',
+          'Tank size, quantity and access requirements will be reviewed',
+          'Cleaning process and schedule will be confirmed with you',
+          'Custom quote will be shared before service'
+        ],
+        excluded: [
+          'Fixed inclusions before consultation',
+          'Structural repair, plumbing replacement or civil work unless agreed separately',
+          'Any work not confirmed during communication'
+        ]
       }
     ]
   }
@@ -447,6 +531,10 @@ function resolveServiceName(serviceName) {
 
 function formatPrice(price) {
   return `&#8377;${price}`;
+}
+
+function getTierPriceLabel(tier, price) {
+  return tier.isCustomQuote ? 'Custom Quote' : formatPrice(price);
 }
 
 function findTier(serviceName, tierName) {
@@ -540,6 +628,11 @@ function renderTiers(serviceName) {
   const service = SERVICES_DATA[serviceName];
   return service.tiers.map((tier) => {
     const price = getPrice(serviceName, tier.name);
+    const safeTierName = tier.name.replace(/'/g, "\\'");
+    const tierPrice = getTierPriceLabel(tier, price);
+    const actionButton = `<div class="cat-cart-control" data-tier="${tier.name}">
+            <button class="cat-add-btn" type="button" data-tier="${tier.name}" onclick="addToCart('${safeTierName}', ${price})">Add</button>
+          </div>`;
     return `
     <div class="cat-tier-card">
       <div class="cat-tier-info">
@@ -550,18 +643,16 @@ function renderTiers(serviceName) {
           <span class="cat-rating-count">(${tier.reviews} reviews)</span>
         </div>
         <div class="cat-tier-price-row">
-          <span class="cat-tier-price">${formatPrice(price)}</span>
+          <span class="cat-tier-price">${tierPrice}</span>
           <span class="cat-tier-duration">&bull; ${tier.duration}</span>
         </div>
         <p class="cat-tier-features">${tier.description}</p>
-        <button class="cat-tier-details-btn" type="button" onclick="openTierDetails('${serviceName}', '${tier.name.replace(/'/g, "\\'")}')">View details</button>
+        <button class="cat-tier-details-btn" type="button" onclick="openTierDetails('${serviceName}', '${safeTierName}')">View details</button>
       </div>
       <div class="cat-tier-action">
         <div class="cat-tier-image-wrapper">
           <img src="${tier.image}" alt="${tier.name}" class="cat-tier-image" loading="lazy" decoding="async">
-          <div class="cat-cart-control" data-tier="${tier.name}">
-            <button class="cat-add-btn" type="button" data-tier="${tier.name}" onclick="addToCart('${tier.name.replace(/'/g, "\\'")}', ${price})">Add</button>
-          </div>
+          ${actionButton}
         </div>
       </div>
     </div>

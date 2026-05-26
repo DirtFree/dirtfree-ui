@@ -35,12 +35,7 @@
 </a>
 
             <nav class="nav-menu">
-                <!-- <div class="city-picker" id="cityPicker">
-                    <div class="picker-trigger">
-                        <span id="currentCity">Ahmedabad</span>
-                        <span class="chevron">⌄</span>
-                    </div>
-                    </div> -->
+                <span class="nav-location-pill" id="navCityLocation">📍 Ahmedabad</span>
                 <a href="index.html">Home</a>
                 <a href="booking.html" class="card-btn book-now-btn">Book Now</a>
             </nav>
@@ -49,8 +44,11 @@
 
     <section class="city-hero">
         <div class="hero-bg" style="background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('Images/Ahm.jpg');;"></div>
-        
-        <div class="hero-content">
+                <div class="city-location-info">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+            Ahmedabad
+        </div>
+                <div class="hero-content">
             <div class="location-badge">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
                 Ahmedabad
@@ -124,6 +122,21 @@
         </div>
     </div>
 </section>
+    <section class="location-map-section" id="location">
+        <div class="location-map-inner">
+            <span class="location-map-tag">Find Us</span>
+            <h2 class="location-map-title">Our Location</h2>
+            <p class="location-map-subtitle">Visit us or find DirtFree Ahmedabad on Google Maps.</p>
+            <div class="location-map-frame">
+                <a class="location-map-open" href="https://www.google.com/maps/search/?api=1&query=DirtFree%20Ahmedabad" target="_blank" rel="noopener">Open in Maps</a>
+                <iframe
+                    title="DirtFree Ahmedabad location map"
+                    src="https://maps.google.com/maps?q=DirtFree%20Ahmedabad&t=&z=13&ie=UTF8&iwloc=&output=embed"
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+        </div>
+    </section>
     <footer class="site-footer" id="contact">
         <div class="site-footer-inner">
             <div class="site-footer-grid">

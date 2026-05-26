@@ -707,11 +707,120 @@ h1 { font-size: 4rem; margin: 20px 0; line-height: 1.1; }
     background-color: #2d826f;
 }
 
+/* --- Location Map Section --- */
+.location-map-section {
+    padding: 70px 5%;
+    background: #ffffff;
+    text-align: center;
+}
+
+.location-map-inner {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.location-map-tag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 32px;
+    padding: 7px 18px;
+    border-radius: 999px;
+    background: #eef8f6;
+    color: #178f7b;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.location-map-title {
+    margin: 18px 0 12px;
+    color: #0f1c2d;
+    font-size: 2.3rem;
+    line-height: 1.15;
+    font-weight: 800;
+}
+
+.location-map-subtitle {
+    margin: 0 auto 42px;
+    max-width: 620px;
+    color: #5f6f89;
+    font-size: 1rem;
+    line-height: 1.7;
+}
+
+.location-map-frame {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    height: 400px;
+    border: 1px solid #dbe3ea;
+    border-radius: 14px;
+    box-shadow: 0 18px 45px rgba(15, 28, 45, 0.08);
+    background: #eef2f5;
+}
+
+.location-map-frame iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+.location-map-open {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 34px;
+    padding: 8px 14px;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #1a73e8;
+    text-decoration: none;
+    font-size: 0.86rem;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(15, 28, 45, 0.16);
+}
+
+.location-map-open:hover {
+    color: #0b57d0;
+}
+
 /* Responsive for Mobile */
 @media (max-width: 768px) {
     .booking-card {
         width: 100%;
         height: 200px;
+    }
+
+    .location-map-section {
+        padding: 52px 5%;
+    }
+
+    .location-map-title {
+        font-size: 1.9rem;
+    }
+
+    .location-map-subtitle {
+        margin-bottom: 30px;
+    }
+
+    .location-map-frame {
+        height: 320px;
+        border-radius: 12px;
+    }
+
+    .location-map-open {
+        top: 10px;
+        left: 10px;
+        max-width: calc(100% - 20px);
+        font-size: 0.8rem;
     }
 }
 
@@ -1123,6 +1232,8 @@ body {
 
 .nav-menu {
     gap: 12px;
+    display: flex;
+    align-items: center;
 }
 
 .nav-menu > a:not(.card-btn),
@@ -1134,6 +1245,8 @@ body {
     border-radius: 10px;
     padding: 0 14px;
     transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    position: relative;
+    z-index: 10;
 }
 
 .nav-menu > a:not(.card-btn):hover,
@@ -1141,30 +1254,6 @@ body {
     background: #f1f5f9;
     color: var(--app-primary);
     transform: translateY(-1px);
-}
-
-.city-dropdown {
-    border: 1px solid var(--app-border);
-    border-radius: 16px;
-    box-shadow: var(--app-shadow);
-}
-
-.city-item {
-    border-radius: 10px;
-    margin: 4px 10px;
-    padding: 13px 15px;
-}
-
-.card-btn,
-.btn-filled,
-.btn-place-order,
-.cat-add-btn {
-    background: linear-gradient(135deg, var(--app-primary) 0%, var(--app-primary-dark) 100%);
-    border: 0;
-    border-radius: 10px;
-    color: #ffffff;
-    box-shadow: 0 8px 20px rgba(74, 144, 226, 0.22);
-    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
 .nav-menu .card-btn {
@@ -1179,6 +1268,9 @@ body {
     color: #ffffff;
     line-height: 1;
     white-space: nowrap;
+    position: relative;
+    z-index: 8;
+    pointer-events: auto !important;
 }
 
 .card-btn:hover,
@@ -1196,9 +1288,147 @@ body {
     border-radius: 10px;
 }
 
-.hero-section,
-.city-hero {
-    min-height: 620px;
+/* --- Location Display on City Pages --- */
+.nav-location-pill {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: #eef6ff;
+    color: #2563eb;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+/* --- Google Reviews Section --- */
+.google-reviews-section {
+    background-color: #ffffff;
+    padding: 80px 8%;
+    font-family: 'Poppins', sans-serif;
+}
+
+.google-reviews-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.reviews-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.reviews-badge {
+    background-color: #dcfce7;
+    color: #00A676;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-block;
+    margin-bottom: 20px;
+}
+
+.reviews-header h2 {
+    font-size: 2.5rem;
+    color: #0f1c2d;
+    font-weight: 800;
+    margin-bottom: 15px;
+}
+
+.reviews-header p {
+    color: #667085;
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.google-reviews-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+    margin-bottom: 40px;
+}
+
+.google-review-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 30px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.google-review-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+}
+
+.google-stars {
+    color: #facc15;
+    font-size: 1.3rem;
+    margin-bottom: 12px;
+    letter-spacing: 2px;
+}
+
+.google-reviewer {
+    font-weight: 700;
+    color: #0f1c2d;
+    font-size: 0.95rem;
+    margin-bottom: 5px;
+}
+
+.google-review-date {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    margin-bottom: 15px;
+}
+
+.google-review-text {
+    color: #475569;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    font-style: italic;
+}
+
+.google-reviews-footer {
+    text-align: center;
+    padding: 30px;
+    background: #f8fafc;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+}
+
+.google-reviews-footer p {
+    color: #667085;
+    margin-bottom: 15px;
+    font-size: 0.95rem;
+}
+
+.google-reviews-btn {
+    display: inline-block;
+    background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+    color: white;
+    padding: 12px 30px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.google-reviews-btn:hover {
+    background: linear-gradient(135deg, #00A676 0%, #008a62 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 166, 118, 0.25);
+}
+
+@media (max-width: 992px) {
+    .google-reviews-grid { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 600px) {
+    .google-reviews-grid { grid-template-columns: 1fr; }
+    .reviews-header h2 { font-size: 2rem; }
+    .city-location-info { top: 100px; right: 20px; }
 }
 
 
