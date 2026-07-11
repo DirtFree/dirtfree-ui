@@ -1,183 +1,71 @@
 /* global cart, updateCartBadge */
 
-// Location-based rates configuration
-const LOCATION_RATES = {
-  'ghaziabad': {
-    'Washroom Cleaning': {
-      'Deep Washroom Cleaning': 249,
-      'Basic Washroom Cleaning': 99
-    },
-    'Kitchen Cleaning': {
-      'Kitchen Deep Cleaning': 499,
-      'Modular Kitchen Deep Cleaning': 999
-    },
-    'Flat Cleaning': {
-      '1 BHK Flat Cleaning': 799,
-      '2 BHK Flat Cleaning': 1299,
-      '3 BHK Flat Cleaning': 1799
-    },
-    'Car Cleaning': {
-      'Cleaning + Exterior Polish': 999,
-      'Cleaning + Interior Polish': 799,
-      'Cleaning + Full': 1699
-    },
-    'Water Tank Cleaning': {
-      'Professional Water Tank Cleaning (500L-1000L)': 599
-    }
-  },
-  'ahmedabad': {
-    'Washroom Cleaning': {
-      'Deep Washroom Cleaning': 289,
-      'Basic Washroom Cleaning': 189
-    },
-    'Kitchen Cleaning': {
-      'Kitchen Deep Cleaning': 499,
-      'Modular Kitchen Deep Cleaning': 1199
-    },
-    'Flat Cleaning': {
-      '1 BHK Flat Cleaning': 1499,
-      '2 BHK Flat Cleaning': 2499,
-      '3 BHK Flat Cleaning': 3499
-    },
-    'Car Cleaning': {
-      'Cleaning + Exterior Polish': 999,
-      'Cleaning + Interior Polish': 799,
-      'Cleaning + Full': 1699
-    },
-    'Water Tank Cleaning': {
-      'Professional Water Tank Cleaning (500L-1000L)': 599
-    }
-  },
-  'chennai': {
-    'Washroom Cleaning': {
-      'Deep Washroom Cleaning': 289,
-      'Basic Washroom Cleaning': 189
-    },
-    'Kitchen Cleaning': {
-      'Kitchen Deep Cleaning': 499,
-      'Modular Kitchen Deep Cleaning': 1199
-    },
-    'Flat Cleaning': {
-      '1 BHK Flat Cleaning': 1499,
-      '2 BHK Flat Cleaning': 2499,
-      '3 BHK Flat Cleaning': 3499
-    },
-    'Car Cleaning': {
-      'Cleaning + Exterior Polish': 999,
-      'Cleaning + Interior Polish': 799,
-      'Cleaning + Full': 1699
-    },
-    'Water Tank Cleaning': {
-      'Professional Water Tank Cleaning (500L-1000L)': 599
-    }
-  },
-  'indore': {
-    'Washroom Cleaning': {
-      'Deep Washroom Cleaning': 289,
-      'Basic Washroom Cleaning': 189
-    },
-    'Kitchen Cleaning': {
-      'Kitchen Deep Cleaning': 499,
-      'Modular Kitchen Deep Cleaning': 1199
-    },
-    'Flat Cleaning': {
-      '1 BHK Flat Cleaning': 1499,
-      '2 BHK Flat Cleaning': 2499,
-      '3 BHK Flat Cleaning': 3499
-    },
-    'Car Cleaning': {
-      'Cleaning + Exterior Polish': 999,
-      'Cleaning + Interior Polish': 799,
-      'Cleaning + Full': 1699
-    },
-    'Water Tank Cleaning': {
-      'Professional Water Tank Cleaning (500L-1000L)': 599
-    }
-  },
-  'betul': {
-    'Washroom Cleaning': {
-      'Deep Washroom Cleaning': 289,
-      'Basic Washroom Cleaning': 189
-    },
-    'Kitchen Cleaning': {
-      'Kitchen Deep Cleaning': 499,
-      'Modular Kitchen Deep Cleaning': 1199
-    },
-    'Flat Cleaning': {
-      '1 BHK Flat Cleaning': 1499,
-      '2 BHK Flat Cleaning': 2499,
-      '3 BHK Flat Cleaning': 3499
-    },
-    'Car Cleaning': {
-      'Cleaning + Exterior Polish': 999,
-      'Cleaning + Interior Polish': 799,
-      'Cleaning + Full': 1699
-    },
-    'Water Tank Cleaning': {
-      'Professional Water Tank Cleaning (500L-1000L)': 599
-    }
-  }
-};
+let SERVICE_CATALOG = {};
+let SERVICE_LOCATIONS = [];
+const KNOWN_CITIES = ['ahmedabad', 'betul', 'chennai', 'ghaziabad', 'indore'];
 
-// Get current location from URL, data attribute, or local storage
+// Get current location from URL, data attribute, session storage, or known locations
 function getCurrentLocation() {
-  const validLocations = Object.keys(LOCATION_RATES);
-  
-  // Check URL parameters FIRST (highest priority for service.html)
+  // Check URL params first
   const urlParams = new URLSearchParams(window.location.search);
-  const paramLocation = urlParams.get('location');
-  if (paramLocation && validLocations.includes(paramLocation.toLowerCase())) {
-    const location = paramLocation.toLowerCase();
-    sessionStorage.setItem('dirtfree-location', location);
-    return location;
+  const paramLocation = (urlParams.get('location') || '').toLowerCase();
+  if (paramLocation && KNOWN_CITIES.includes(paramLocation)) {
+    sessionStorage.setItem('dirtfree-location', paramLocation);
+    return paramLocation;
   }
 
-  // Check for explicit location data attribute on body or container
-  const bodyLocation = document.body.dataset.location;
-  if (bodyLocation && validLocations.includes(bodyLocation.toLowerCase())) {
-    const location = bodyLocation.toLowerCase();
-    sessionStorage.setItem('dirtfree-location', location);
-    return location;
+  // Check body data attribute
+  const bodyLocation = (document.body.dataset.location || '').toLowerCase();
+  if (bodyLocation && KNOWN_CITIES.includes(bodyLocation)) {
+    sessionStorage.setItem('dirtfree-location', bodyLocation);
+    return bodyLocation;
   }
 
-  // Detect location from current page filename
+  // Check page filename only if it's a known city (not "service", "booking", etc)
   const pageFile = window.location.pathname.split('/').pop().replace('.html', '').toLowerCase();
-  
-  // Check if pageFile is a valid location
-  if (validLocations.includes(pageFile)) {
+  if (pageFile && KNOWN_CITIES.includes(pageFile)) {
     sessionStorage.setItem('dirtfree-location', pageFile);
     return pageFile;
   }
 
-  // Also check the full pathname in case it's in a subdirectory
+  // Check path parts for known cities
   const pathParts = window.location.pathname.split('/').filter(p => p);
   for (let part of pathParts) {
     const cleanPart = part.replace('.html', '').toLowerCase();
-    if (validLocations.includes(cleanPart)) {
+    if (KNOWN_CITIES.includes(cleanPart)) {
       sessionStorage.setItem('dirtfree-location', cleanPart);
       return cleanPart;
     }
   }
 
-  // Check if location is stored in session storage (fallback)
+  // Check session storage as fallback
   const storedLocation = sessionStorage.getItem('dirtfree-location');
-  if (storedLocation && LOCATION_RATES[storedLocation]) {
+  if (storedLocation && KNOWN_CITIES.includes(storedLocation)) {
     return storedLocation;
   }
 
-  // Default to first available location if not detected
-  return validLocations[0];
+  return null;
 }
 
 // Set location explicitly and refresh UI
 function setLocation(location) {
-  if (LOCATION_RATES[location]) {
-    sessionStorage.setItem('dirtfree-location', location);
-    // Refresh the service category display with new location
+  const normalized = String(location || '').toLowerCase();
+  if (KNOWN_CITIES.includes(normalized)) {
+    sessionStorage.setItem('dirtfree-location', normalized);
     refreshServiceData();
     return true;
   }
   return false;
+}
+
+// Change location and show picker
+function changeLocation() {
+  sessionStorage.removeItem('dirtfree-location');
+  const container = document.getElementById('service-category-container');
+  if (container) {
+    container.innerHTML = '';
+    showLocationPickerModal();
+  }
 }
 
 // Refresh service data and prices for current location
@@ -185,348 +73,31 @@ function refreshServiceData() {
   const container = document.getElementById('service-category-container');
   if (container) {
     const currentServiceName = document.querySelector('.cat-main-title')?.dataset.serviceName || null;
-    // Clear and reinitialize to get fresh prices for current location
     initServiceCategory('service-category-container', currentServiceName);
   }
 }
 
-// Get price for a specific service and tier in current location
+// Get price for a specific service and tier in the current location
 function getPrice(serviceName, tierName) {
-  const location = getCurrentLocation();
-  const price = LOCATION_RATES[location]?.[serviceName]?.[tierName];
-  return price !== undefined ? price : 0;
+  const service = getServicesData()[serviceName];
+  const tier = service?.tiers.find((item) => item.name === tierName);
+  return tier?.price ?? 0;
 }
 
-const SERVICES_DATA = {
-  'Washroom Cleaning': {
-    title: 'Bathroom Cleaning',
-    tiers: [
-      {
-        name: 'Deep Washroom Cleaning',
-        price: null, // Dynamic price based on location
-        duration: '60 mins',
-        rating: 4.8,
-        reviews: '1.2K',
-        description: 'Machine-assisted deep cleaning to remove stains, grime, and bacteria for complete sanitation.',
-        image: 'Images/washroom.jpg',
-        badge: 'BESTSELLER',
-        detailsSummary: 'Machine-assisted deep bathroom cleaning.',
-        included: [
-          'Deep cleaning of toilet seat, washbasin, taps and tiles',
-          'Stain removal from key bathroom surfaces',
-          'Mirror and fixture cleaning',
-          'Floor scrubbing and mopping',
-          'Germ control for improved sanitation'
-        ],
-        excluded: [
-          'Ceiling and exhaust fan dismantling',
-          'Major repair or plumbing work',
-          'Acid damage and permanent stain reversal',
-          'Cleaning in inaccessible shaft areas'
-        ]
-      },
-      {
-        name: 'Basic Washroom Cleaning',
-        price: null, // Dynamic price based on location
-        duration: '60 mins',
-        rating: 4.8,
-        reviews: '1.2K',
-        description: 'Surface cleaning, mopping, mirror cleaning, fixture polishing',
-        image: 'Images/washroom.jpg',
-        detailsSummary: 'Surface-level bathroom cleaning.',
-        included: [
-          'Surface cleaning of toilet, washbasin and taps',
-          'Mirror cleaning and fixture polishing',
-          'Floor mopping',
-          'Basic tile wipe-down'
-        ],
-        excluded: [
-          'Machine-assisted stain removal',
-          'Hard water deposit treatment',
-          'Deep grout scrubbing',
-          'Ceiling and wall washing'
-        ]
-      }
-    ]
-  },
-  'Kitchen Cleaning': {
-    title: 'Kitchen Cleaning',
-    tiers: [
-      {
-        name: 'Kitchen Deep Cleaning',
-        price: null, // Dynamic price based on location
-        duration: '60 mins',
-        rating: 4.8,
-        reviews: '1.2K',
-        description: 'Complete cleaning of kitchen surfaces to remove oil, grease, and dirt, ensuring a clean and hygienic cooking space.',
-        image: 'Images/Kitchen.jpg',
-        badge: 'BESTSELLER',
-        detailsSummary: 'Deep kitchen cleaning for daily cooking zones.',
-        included: [
-          'Degreasing of visible kitchen surfaces',
-          'Cleaning of countertop, sink and backsplash',
-          'Exterior wiping of cabinets and drawers',
-          'Hob and chimney exterior cleaning',
-          'Floor cleaning and mopping'
-        ],
-        excluded: [
-          'Internal cleaning of appliances',
-          'Dismantling of chimney filters',
-          'Pest-control treatment',
-          'Carpentry or plumbing work'
-        ]
-      },
-      {
-        name: 'Modular Kitchen Deep Cleaning',
-        price: null, // Dynamic price based on location
-        duration: '60 mins',
-        rating: 4.8,
-        reviews: '1.2K',
-        description: 'Intensive removal of oil, grease, and food residue from all key modular kitchen surfaces for a hygienic cooking space.',
-        image: 'Images/Kitchen.jpg',
-        detailsSummary: 'Detailed modular kitchen cleaning.',
-        included: [
-          'Deep cleaning of shutters, drawers and shelves',
-          'Degreasing of cabinet exteriors and accessible interiors',
-          'Countertop, sink and backsplash cleaning',
-          'Hob and chimney exterior cleaning',
-          'Floor scrubbing and mopping'
-        ],
-        excluded: [
-          'Full appliance servicing',
-          'Removal of permanently damaged laminate marks',
-          'Pest-control treatment',
-          'Cleaning inside sealed or inaccessible sections'
-        ]
-      }
-    ]
-  },
-  'Flat Cleaning': {
-    title: 'Home Cleaning',
-    tiers: [
-      {
-        name: '1 BHK Flat Cleaning',
-        price: null, // Dynamic price based on location
-        duration: '60 mins',
-        rating: 4.8,
-        reviews: '1.2K',
-        description: 'Thorough deep cleaning for unfurnished 1 BHK flats, covering all essential living areas.',
-        image: 'Images/flat.jpg',
-        badge: 'BESTSELLER',
-        detailsSummary: 'Unfurnished flat deep cleaning.',
-        included: [
-          'Deep cleaning of living room, bedroom, kitchen, bathroom and balcony',
-          'Floor sweeping, mopping and machine scrubbing where required',
-          'Dusting of ceilings, fans, switchboards and light fixtures',
-          'Kitchen slab, tiles and sink cleaning',
-          'Bathroom deep cleaning including toilet seat, washbasin, taps and tiles',
-          'Side walls, partition glass and stain removal'
-        ],
-        excluded: [
-          'Furnished interiors and furniture cleaning',
-          'Glue, paint stain or sticker removal',
-          'Terrace cleaning or inaccessible areas',
-          'Wet wiping of walls and ceilings',
-          'Window tracks and mirror cleaning',
-          'Acid damage, permanent stains, or etched surfaces'
-        ]
-      },
-      {
-        name: '2 BHK Flat Cleaning',
-        price: null, // Dynamic price based on location
-        duration: '60 mins',
-        rating: 4.8,
-        reviews: '1.2K',
-        description: 'Comprehensive deep cleaning for unfurnished 2 BHK flats, ensuring complete hygiene and freshness.',
-        image: 'Images/flat.jpg',
-        detailsSummary: 'Unfurnished flat deep cleaning.',
-        included: [
-          'Deep cleaning of all rooms, kitchen, bathrooms and balcony',
-          'Floor sweeping, mopping and machine scrubbing where required',
-          'Dusting of ceilings, fans, switchboards and light fixtures',
-          'Kitchen slab, tiles and sink cleaning',
-          'Bathroom deep cleaning including toilet seat, washbasin, taps and tiles',
-          'Side walls, partition glass and stain removal'
-        ],
-        excluded: [
-          'Furnished interiors and furniture cleaning',
-          'Glue, paint stain or sticker removal',
-          'Terrace cleaning or inaccessible areas',
-          'Wet wiping of walls and ceilings',
-          'Window tracks and mirror cleaning',
-          'Acid damage, permanent stains, or etched surfaces'
-        ]
-      },
-      {
-        name: '3 BHK Flat Cleaning',
-        price: null, // Dynamic price based on location
-        duration: '60 mins',
-        rating: 4.8,
-        reviews: '1.2K',
-        description: 'End-to-end deep cleaning for unfurnished 3 BHK flats with detailed attention to every room.',
-        image: 'Images/flat.jpg',
-        detailsSummary: 'Unfurnished flat deep cleaning.',
-        included: [
-          'Deep cleaning of all rooms, kitchen, bathrooms and balcony',
-          'Floor sweeping, mopping and machine scrubbing where required',
-          'Dusting of ceilings, fans, switchboards and light fixtures',
-          'Kitchen slab, tiles and sink cleaning',
-          'Bathroom deep cleaning including toilet seat, washbasin, taps and tiles',
-          'Side walls, partition glass and stain removal'
-        ],
-        excluded: [
-          'Furnished interiors and furniture cleaning',
-          'Glue, paint stain or sticker removal',
-          'Terrace cleaning or inaccessible areas',
-          'Wet wiping of walls and ceilings',
-          'Window tracks and mirror cleaning',
-          'Acid damage, permanent stains, or etched surfaces'
-        ]
-      }
-    ]
-  },
-  'Car Cleaning': {
-    title: 'Car Cleaning',
-    tiers: [
-      {
-        name: 'Cleaning + Exterior Polish',
-        price: null, // Dynamic price based on location
-        duration: '1 hour',
-        rating: 4.7,
-        reviews: '856',
-        description: 'Professional exterior car cleaning with polish for a shiny finish.',
-        image: 'Images/Car.jpg',
-        badge: 'POPULAR',
-        detailsSummary: 'Exterior cleaning and polish.',
-        included: [
-          'Exterior wash and rinse',
-          'Exterior polish for shine',
-          'Tire cleaning',
-          'Windshield cleaning'
-        ],
-        excluded: [
-          'Interior cleaning',
-          'Mechanical servicing',
-          'Scratch repair',
-          'Paint restoration'
-        ]
-      },
-      {
-        name: 'Cleaning + Interior Polish',
-        price: null, // Dynamic price based on location
-        duration: '1 hour',
-        rating: 4.7,
-        reviews: '856',
-        description: 'Professional interior car cleaning with polish for a fresh look.',
-        image: 'Images/Car.jpg',
-        badge: 'BESTSELLER',
-        detailsSummary: 'Interior cleaning and polish.',
-        included: [
-          'Interior vacuuming',
-          'Seat cleaning',
-          'Carpet shampooing',
-          'Dashboard polish',
-          'Air freshener'
-        ],
-        excluded: [
-          'Exterior cleaning',
-          'Mechanical servicing',
-          'Scratch repair',
-          'Upholstery repair'
-        ]
-      },
-      {
-        name: 'Cleaning + Full',
-        price: null, // Dynamic price based on location
-        duration: '2 hours',
-        rating: 4.8,
-        reviews: '856',
-        description: 'Comprehensive interior and exterior car cleaning with complete polish finish.',
-        image: 'Images/Car.jpg',
-        badge: 'BESTSELLER',
-        detailsSummary: 'Complete interior and exterior cleaning with polish.',
-        included: [
-          'Exterior wash and rinse',
-          'Exterior polish for shine',
-          'Interior vacuuming',
-          'Seat cleaning',
-          'Carpet shampooing',
-          'Dashboard polish',
-          'Windshield cleaning',
-          'Tire cleaning and dressing',
-          'Air freshener'
-        ],
-        excluded: [
-          'Mechanical servicing',
-          'Scratch repair',
-          'Paint restoration',
-          'Upholstery repair'
-        ]
-      }
-    ]
-  },
-  'Water Tank Cleaning': {
-    title: 'Water Tank Cleaning',
-    tiers: [
-      {
-        name: 'Professional Water Tank Cleaning (500L-1000L)',
-        price: null, // Dynamic price based on location
-        duration: '2-4 hours',
-        rating: 4.8,
-        reviews: '743',
-        description: 'Deep cleaning and disinfection of overhead water tanks with professional equipment.',
-        image: 'Images/WT.jpg',
-        badge: 'BESTSELLER',
-        detailsSummary: 'Water tank deep cleaning.',
-        included: [
-          'Tank inspection',
-          'Deep scrubbing',
-          'Disinfection',
-          'Debris removal',
-          'Water quality check'
-        ],
-        excluded: [
-          'Structural repair',
-          'Plumbing replacement',
-          'Civil work'
-        ]
-      },
-      {
-        name: 'Commercial Water Tank Cleaning',
-        isCustomQuote: true,
-        duration: 'Custom',
-        rating: 4.8,
-        reviews: '743',
-        description: 'Custom commercial water tank cleaning. Share your requirements and our team will reach out for more information.',
-        image: 'Images/WT.jpg',
-        badge: 'CUSTOM',
-        detailsSummary: 'Commercial water tank cleaning planned after consultation.',
-        included: [
-          'Scope of cleaning will be decided after communication',
-          'Tank size, quantity and access requirements will be reviewed',
-          'Cleaning process and schedule will be confirmed with you',
-          'Custom quote will be shared before service'
-        ],
-        excluded: [
-          'Fixed inclusions before consultation',
-          'Structural repair, plumbing replacement or civil work unless agreed separately',
-          'Any work not confirmed during communication'
-        ]
-      }
-    ]
-  }
-};
+function getServicesData() {
+  return SERVICE_CATALOG || {};
+}
 
 function getServiceDisplayName(serviceName) {
-  return SERVICES_DATA[serviceName]?.title || serviceName;
+  return getServicesData()[serviceName]?.title || serviceName;
 }
 
 function resolveServiceName(serviceName) {
-  if (SERVICES_DATA[serviceName]) return serviceName;
+  const catalog = getServicesData();
+  if (catalog[serviceName]) return serviceName;
 
-  return Object.keys(SERVICES_DATA).find(
-    (key) => SERVICES_DATA[key].title === serviceName
-  ) || Object.keys(SERVICES_DATA)[0];
+  const keys = Object.keys(catalog);
+  return keys.find((key) => catalog[key].title === serviceName) || keys[0] || '';
 }
 
 function formatPrice(price) {
@@ -537,16 +108,259 @@ function getTierPriceLabel(tier, price) {
   return tier.isCustomQuote ? 'Custom Quote' : formatPrice(price);
 }
 
-function findTier(serviceName, tierName) {
-  return SERVICES_DATA[serviceName]?.tiers.find((tier) => tier.name === tierName) || null;
+function capitalize(str) {
+  return String(str || '').replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
-function initServiceCategory(containerId, selectedService = null) {
+function findTier(serviceName, tierName) {
+  return getServicesData()[serviceName]?.tiers.find((tier) => tier.name === tierName) || null;
+}
+
+async function fetchServicesFromSupabase() {
+  if (!window.supabase) {
+    return;
+  }
+
+  try {
+    const location = getCurrentLocation();
+    const query = window.supabase
+      .from('services')
+      .select('*')
+      .order('category', { ascending: true })
+      .order('name', { ascending: true })
+      .order('tier', { ascending: true });
+
+    if (location) {
+      query.in('location', [location, 'all']);
+    }
+
+    const { data, error } = await query;
+
+    if (error || !Array.isArray(data) || data.length === 0) {
+      return;
+    }
+
+    const catalog = {};
+    const locations = new Set();
+    const serviceRows = {};
+
+    data.forEach((row) => {
+      const rowLocation = String(row.location || '').toLowerCase();
+      if (rowLocation) locations.add(rowLocation);
+
+      const serviceKey = `${row.category}||${row.tier}||${row.name}`;
+      const existing = serviceRows[serviceKey];
+
+      if (existing) {
+        if (existing.location === 'all' && rowLocation !== 'all') {
+          serviceRows[serviceKey] = row;
+        }
+        return;
+      }
+
+      serviceRows[serviceKey] = row;
+    });
+
+    Object.values(serviceRows).forEach((row) => {
+      const category = row.category || row.name || 'Unknown Service';
+      const title = row.title || row.name || category;
+      const tierName = row.tier || row.name || title;
+
+      if (!catalog[category]) {
+        catalog[category] = {
+          title,
+          tiers: []
+        };
+      }
+
+      catalog[category].tiers.push({
+        name: tierName,
+        price: row.price ?? null,
+        duration: row.duration || '60 mins',
+        rating: row.rating ?? 4.8,
+        reviews: row.reviews || '1K',
+        description: row.description || row.details_summary || '',
+        image: row.image || 'Images/washroom.jpg',
+        badge: row.badge || '',
+        detailsSummary: row.details_summary || row.description || '',
+        included: Array.isArray(row.included) ? row.included : [],
+        excluded: Array.isArray(row.excluded) ? row.excluded : []
+      });
+    });
+
+    if (Object.keys(catalog).length) {
+      SERVICE_CATALOG = catalog;
+      SERVICE_LOCATIONS = Array.from(locations);
+    }
+  } catch (err) {
+    console.warn('Could not load service catalog from Supabase:', err);
+  }
+}
+
+function showLocationPickerModal() {
+  const existingModal = document.getElementById('serviceLocationPickerModal');
+  if (existingModal) {
+    existingModal.remove();
+  }
+
+  const CITIES = KNOWN_CITIES.map(city => city.charAt(0).toUpperCase() + city.slice(1));
+  const modal = document.createElement('div');
+  modal.id = 'serviceLocationPickerModal';
+  modal.innerHTML = `
+    <div class="location-picker-overlay">
+      <div class="location-picker-dialog">
+        <div class="location-picker-header">
+          <h2>Select Your City</h2>
+          <p>Choose a city to browse available services</p>
+        </div>
+        <div class="location-picker-grid">
+          ${CITIES.map(city => `
+            <button type="button" class="location-picker-btn" data-location="${city.toLowerCase()}">
+              <span class="location-picker-emoji">📍</span>
+              <span class="location-picker-name">${city}</span>
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+    <style>
+      #serviceLocationPickerModal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .location-picker-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .location-picker-dialog {
+        background: white;
+        border-radius: 16px;
+        padding: 32px 24px;
+        max-width: 480px;
+        width: 100%;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      }
+
+      .location-picker-header {
+        text-align: center;
+        margin-bottom: 28px;
+      }
+
+      .location-picker-header h2 {
+        font-size: 24px;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0 0 8px 0;
+      }
+
+      .location-picker-header p {
+        font-size: 14px;
+        color: #64748b;
+        margin: 0;
+      }
+
+      .location-picker-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+
+      .location-picker-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 20px 16px;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        background: #f8fafc;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-family: inherit;
+      }
+
+      .location-picker-btn:hover {
+        border-color: #4a90e2;
+        background: #f0f4ff;
+        transform: translateY(-2px);
+      }
+
+      .location-picker-emoji {
+        font-size: 24px;
+      }
+
+      .location-picker-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: #0f172a;
+      }
+
+      @media (max-width: 480px) {
+        .location-picker-dialog {
+          padding: 24px 16px;
+        }
+
+        .location-picker-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  `;
+
+  document.body.appendChild(modal);
+
+  modal.querySelectorAll('.location-picker-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const location = btn.dataset.location;
+      setLocation(location);
+      modal.remove();
+      initServiceCategory('service-category-container');
+    });
+  });
+}
+
+async function initServiceCategory(containerId, selectedService = null) {
   const container = document.getElementById(containerId);
   if (!container) return;
 
-  const serviceNames = Object.keys(SERVICES_DATA);
-  const firstService = selectedService ? resolveServiceName(selectedService) : serviceNames[0];
+  const currentLocation = getCurrentLocation();
+  if (!currentLocation) {
+    container.innerHTML = '';
+    showLocationPickerModal();
+    return;
+  }
+
+  await fetchServicesFromSupabase();
+  
+  const serviceNames = Object.keys(getServicesData());
+  if (serviceNames.length === 0) {
+    container.innerHTML = `
+      <div class="service-loading-error">
+        <p>No services are available in ${capitalize(currentLocation)} yet. Please check back soon or try another location.</p>
+        <button type="button" onclick="changeLocation()" class="card-btn" style="margin-top: 16px;">Change Location</button>
+      </div>`;
+    return;
+  }
+
+  const firstService = selectedService ? resolveServiceName(selectedService) : serviceNames[0] || serviceNames[0];
 
   container.innerHTML = `
     <section class="cat-section">
@@ -625,7 +439,10 @@ function initServiceCategory(containerId, selectedService = null) {
 }
 
 function renderTiers(serviceName) {
-  const service = SERVICES_DATA[serviceName];
+  const service = getServicesData()[serviceName];
+  if (!service || !Array.isArray(service.tiers)) {
+    return '<p class="service-loading-error">Service information is not available.</p>';
+  }
   return service.tiers.map((tier) => {
     const price = getPrice(serviceName, tier.name);
     const safeTierName = tier.name.replace(/'/g, "\\'");
@@ -702,6 +519,9 @@ function openTierDetails(serviceName, tierName) {
   const modal = document.getElementById('catDetailsModal');
 
   if (!tier || !modal) return;
+
+  const included = Array.isArray(tier.included) ? tier.included : [];
+  const excluded = Array.isArray(tier.excluded) ? tier.excluded : [];
 
   document.getElementById('catDetailsTitle').textContent = tier.name;
   document.getElementById('catDetailsSummary').textContent = tier.detailsSummary || tier.description;
@@ -955,6 +775,7 @@ window.decreaseCartItem = decreaseCartItem;
 window.removeFromCartMini = removeFromCartMini;
 window.getCurrentLocation = getCurrentLocation;
 window.setLocation = setLocation;
+window.changeLocation = changeLocation;
 window.getPrice = getPrice;
 window.refreshServiceData = refreshServiceData;
 

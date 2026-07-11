@@ -699,23 +699,49 @@ CartManager.prototype.saveOrderToHistory = async function(orderData) {
   }
 
   try {
-    const { data, error } = await this.supabase
+    const baseOrderPayload = {
+      user_id: currentUser.id,
+      service: orderData.service,
+      location: orderData.location,
+      date: orderData.date,
+      slot: orderData.slot,
+      total: orderData.total,
+      // The current orders.cart_items column is varchar, so store the cart
+      // array as JSON text. (Use a jsonb column if you later need to query
+      // individual cart items in SQL.)
+      cart_items: JSON.stringify(orderData.cartItems),
+      created_at: new Date().toISOString()
+    };
+
+    const orderPayload = { ...baseOrderPayload };
+    if (orderData.name && String(orderData.name).trim()) {
+      orderPayload.customer_name = orderData.name.trim();
+    }
+    if (orderData.phone && String(orderData.phone).trim()) {
+      orderPayload.customer_phone = orderData.phone.trim();
+    }
+    if (orderData.address && String(orderData.address).trim()) {
+      orderPayload.address = orderData.address.trim();
+    }
+
+    let { data, error } = await this.supabase
       .from('orders')
-      .insert([{
-        user_id: currentUser.id,
-        service: orderData.service,
-        location: orderData.location,
-        date: orderData.date,
-        slot: orderData.slot,
-        total: orderData.total,
-        // The current orders.cart_items column is varchar, so store the cart
-        // array as JSON text. (Use a jsonb column if you later need to query
-        // individual cart items in SQL.)
-        cart_items: JSON.stringify(orderData.cartItems),
-        created_at: new Date().toISOString()
-      }])
+      .insert([orderPayload])
       .select()
       .single();
+
+    if (error && error.message && /customer_name|customer_phone|address|column/i.test(error.message)) {
+      const fallbackPayload = { ...baseOrderPayload };
+      delete fallbackPayload.customer_name;
+      delete fallbackPayload.customer_phone;
+      delete fallbackPayload.address;
+
+      ({ data, error } = await this.supabase
+        .from('orders')
+        .insert([fallbackPayload])
+        .select()
+        .single());
+    }
 
     if (error) {
       console.error('Error saving order:', error);

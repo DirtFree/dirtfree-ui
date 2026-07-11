@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DirtFree Admin Dashboard</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <header class="main-header admin-header">
+        <div class="header-container">
+            <a href="index.html" class="logo-link">
+                <div class="logo">
+                    <div class="logo-img">
+                        <svg viewBox="0 0 100 100" width="40" height="40" aria-hidden="true">
+                            <circle cx="50" cy="50" r="48" fill="#4A90E2" />
+                            <path d="M50 20 L50 70 M30 70 L70 70 M35 75 L65 75 M40 80 L60 80" stroke="white" stroke-width="6" stroke-linecap="round" />
+                        </svg>
+                    </div>
+                    <div class="logo-text">DIRTFREE</div>
+                    <div class="logo-tagline">ADMIN DASHBOARD</div>
+                </div>
+            </a>
+            <nav class="nav-menu">
+                <a href="index.html">Home</a>
+                <a href="admin.html" class="nav-home-link">Admin</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="admin-page">
+        <section id="adminLoginSection" class="admin-login">
+            <div class="admin-login-card">
+                <h2>Administrator sign in</h2>
+                <p>Enter the admin login ID and password to access the dashboard.</p>
+                <form id="adminLoginForm">
+                    <label class="field-label">
+                        Username
+                        <input id="adminUsername" type="text" autocomplete="username" required />
+                    </label>
+                    <label class="field-label">
+                        Password
+                        <input id="adminPassword" type="password" autocomplete="current-password" required />
+                    </label>
+                    <button type="submit" class="card-btn admin-login-btn">Sign in</button>
+                    <div id="adminLoginError" class="admin-login-error" aria-live="polite"></div>
+                </form>
+            </div>
+        </section>
+
+        <section id="adminHeroSection" class="admin-hero hidden">
+            <div class="admin-hero-shell">
+                <div class="admin-hero-copy">
+                    <span class="badge">Order control for every city</span>
+                    <h1>Admin dashboard for DirtFree orders</h1>
+                    <p class="admin-desc">
+                        Monitor bookings across cities, track completion status, and stay on top of every delivery with a clean administrative view.
+                    </p>
+                </div>
+                <div class="admin-summary-cards">
+                    <article class="summary-card">
+                        <span>Total Orders</span>
+                        <strong id="totalOrders">0</strong>
+                    </article>
+                    <article class="summary-card">
+                        <span>Done</span>
+                        <strong id="doneOrders">0</strong>
+                    </article>
+                    <article class="summary-card">
+                        <span>Pending</span>
+                        <strong id="pendingOrders">0</strong>
+                    </article>
+                    <article class="summary-card">
+                        <span>Cities</span>
+                        <strong id="cityCount">0</strong>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section id="adminDashboardSection" class="admin-dashboard hidden">
+            <div class="dashboard-header">
+                <div>
+                    <h2>Admin control center</h2>
+                    <p>Manage orders, services, and search by order or service from one secure dashboard.</p>
+                </div>
+                <div class="dashboard-actions">
+                    <label class="field-label">
+                        City
+                        <select id="cityFilter">
+                            <option value="all">All cities</option>
+                        </select>
+                    </label>
+                    <label class="field-label">
+                        Search
+                        <input id="searchInput" type="search" placeholder="Search order ID or service" />
+                    </label>
+                    <button type="button" id="adminLogoutBtn" class="card-btn admin-logout-btn">Logout</button>
+                </div>
+            </div>
+
+            <div class="admin-tabs">
+                <button type="button" class="tab-btn active" data-panel="ordersPanel">Orders</button>
+                <button type="button" class="tab-btn" data-panel="servicesPanel">Services</button>
+            </div>
+
+            <div id="ordersPanel" class="admin-panel">
+                <div id="statusMessage" class="admin-status-message" aria-live="polite"></div>
+                <div id="ordersContainer" class="orders-container"></div>
+            </div>
+
+            <div id="servicesPanel" class="admin-panel hidden">
+                <section class="service-manager">
+                    <div class="service-manager-header">
+                        <div>
+                            <h3>Service catalog</h3>
+                            <p>Add, edit, and remove service offerings that customers can book.</p>
+                        </div>
+                    </div>
+                    <div class="service-manager-toolbar">
+                        <label class="field-label">
+                            Filter by location
+                            <select id="serviceLocationFilter">
+                                <option value="all">All locations</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="service-manager-grid">
+                        <article class="service-form-card">
+                            <h4>Add / edit service</h4>
+                            <form id="serviceForm">
+                                <input type="hidden" id="serviceId" value="" />
+                                <label class="field-label">
+                                    Category
+                                    <input id="serviceCategory" type="text" required placeholder="e.g. Washroom Cleaning" />
+                                </label>
+                                <label class="field-label">
+                                    Service name
+                                    <input id="serviceName" type="text" required placeholder="e.g. Washroom Cleaning" />
+                                </label>
+                                <label class="field-label">
+                                    Tier name
+                                    <input id="serviceTier" type="text" required placeholder="e.g. Deep Washroom Cleaning" />
+                                </label>
+                                <label class="field-label">
+                                    Location
+                                    <select id="serviceLocation">
+                                        <option value="">Select a city</option>
+                                        <option value="all">All locations</option>
+                                        <option value="ahmedabad">Ahmedabad</option>
+                                        <option value="betul">Betul</option>
+                                        <option value="chennai">Chennai</option>
+                                        <option value="ghaziabad">Ghaziabad</option>
+                                        <option value="indore">Indore</option>
+                                    </select>
+                                </label>
+                                <label class="field-label">
+                                    Title
+                                    <input id="serviceTitle" type="text" placeholder="Optional display title" />
+                                </label>
+                                <label class="field-label">
+                                    Price
+                                    <input id="servicePrice" type="number" min="0" step="1" placeholder="e.g. 499" />
+                                </label>
+                                <label class="field-label">
+                                    Duration
+                                    <input id="serviceDuration" type="text" placeholder="e.g. 60 mins" />
+                                </label>
+                                <label class="field-label">
+                                    Badge
+                                    <input id="serviceBadge" type="text" placeholder="e.g. BESTSELLER" />
+                                </label>
+                                <label class="field-label">
+                                    Image URL
+                                    <input id="serviceImage" type="text" placeholder="e.g. Images/washroom.jpg" />
+                                </label>
+                                <label class="field-label">
+                                    Included
+                                    <textarea id="serviceIncluded" rows="4" placeholder="One item per line"></textarea>
+                                </label>
+                                <label class="field-label">
+                                    Excluded
+                                    <textarea id="serviceExcluded" rows="4" placeholder="One item per line"></textarea>
+                                </label>
+                                <label class="field-label">
+                                    Description
+                                    <textarea id="serviceDescription" rows="4" placeholder="Short description"></textarea>
+                                </label>
+                                <label class="field-label field-checkbox">
+                                    <input id="serviceActive" type="checkbox" checked /> Active
+                                </label>
+                                <div class="service-form-actions">
+                                    <button type="submit" class="card-btn">Save service</button>
+                                    <button type="button" id="serviceFormReset" class="card-btn secondary">Reset</button>
+                                </div>
+                                <div id="serviceFormMessage" class="service-form-message" aria-live="polite"></div>
+                            </form>
+                        </article>
+
+                        <article class="service-list-card">
+                            <h4>Existing services</h4>
+                            <div id="serviceList" class="service-list"></div>
+                        </article>
+                    </div>
+                </section>
+            </div>
+        </section>
+    </main>
+
+    <script src="/supabase-config.js" defer></script>
+    <script src="/admin.js" defer></script>
+</body>
+</html>

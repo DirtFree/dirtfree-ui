@@ -7,12 +7,31 @@
 alter table public.orders
   add column if not exists user_id bigint;
 
+alter table public.orders
+  add column if not exists customer_name text;
+
+alter table public.orders
+  add column if not exists customer_phone text;
+
+alter table public.orders
+  add column if not exists address text;
+
 -- Link each future order to its customer. Existing orders remain valid with
 -- a NULL user_id because they were created before accounts were added.
-alter table public.orders
-  add constraint orders_user_id_fkey
-  foreign key (user_id) references public."user"(id)
-  on delete set null;
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_constraint
+    where conname = 'orders_user_id_fkey'
+      and conrelid = 'public.orders'::regclass
+  ) then
+    alter table public.orders
+      add constraint orders_user_id_fkey
+      foreign key (user_id) references public."user"(id)
+      on delete set null;
+  end if;
+end $$;
 
 create index if not exists orders_user_id_created_at_idx
   on public.orders (user_id, created_at desc);

@@ -56,6 +56,7 @@
                     <!-- <a href="#pricing">Pricing</a> -->
                     <a href="#faq">FAQ</a>
                     <a href="#contact">Contact</a>
+                    <a href="admin.html">Admin</a>
                     <a href="#" id="bookNowBtn" class="card-btn book-now-btn disabled" title="Select a location first">Book Now</a>
                 </nav>
         </div>
@@ -208,48 +209,117 @@
             </div>
         </div>
     </section>
-        <section class="reviews-section">
+        <section class="reviews-section" id="reviews">
         <div class="reviews-container">
+            <!-- Animated background globe -->
+            <div class="globe-background">
+                <div class="globe-element globe-1">🌍</div>
+                <div class="globe-element globe-2">🌎</div>
+                <div class="globe-element globe-3">🌏</div>
+            </div>
+
             <div class="reviews-header">
-                <span class="badge-green">Reviews</span>
+                <span class="badge-green">⭐ Reviews</span>
                 <h2>What Our Clients <br> Say About Us</h2>
             </div>
 
-            <div class="testimonial-grid">
-                <div class="testimonial-card">
-                    <div class="user-info">
-                        <div class="avatar">KK</div>
-                        <div class="name-meta">
-                            <h3>Kamal Kayada</h3>
-                            <span>Homeowner</span>
+            <!-- Horizontal scrolling carousel with alternating positions -->
+            <div class="reviews-carousel-wrapper">
+                <div class="reviews-carousel">
+                    <div class="testimonial-card testimonial-up" style="animation-delay: 0s;">
+                        <div class="card-shine"></div>
+                        <div class="review-score">★★★★★</div>
+                        <p class="quote">"DirtFree transformed my home! Their attention to detail is incredible."</p>
+                        <div class="user-info">
+                            <div class="avatar avatar-kk">KK</div>
+                            <div class="name-meta">
+                                <h3>Kamal Kayada</h3>
+                                <span>Ahmedabad</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="stars">★★★★★</div>
-                    <p class="quote">"DirtFree transformed my home! Their attention to detail is incredible. I've never seen my kitchen sparkle like this. Highly recommend!"</p>
-                </div>
 
-                <div class="testimonial-card">
-                    <div class="user-info">
-                        <div class="avatar">MK</div>
-                        <div class="name-meta">
-                            <h3>Mitesh Kariya</h3>
-                            <span>Apartment</span>
+                    <div class="testimonial-card testimonial-down" style="animation-delay: 0s;">
+                        <div class="card-shine"></div>
+                        <div class="review-score">★★★★★</div>
+                        <p class="quote">"Professional, punctual, and thorough. Worth every penny!"</p>
+                        <div class="user-info">
+                            <div class="avatar avatar-mk">MK</div>
+                            <div class="name-meta">
+                                <h3>Mitesh Kariya</h3>
+                                <span>Betul</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="stars">★★★★★</div>
-                    <p class="quote">"Professional, punctual, and thorough. They got my full deposit back when I moved out. Worth every penny!"</p>
-                </div>
 
-                <div class="testimonial-card">
-                    <div class="user-info">
-                        <div class="avatar">DB</div>
-                        <div class="name-meta">
-                            <h3>Dharni Bhrambhatt</h3>
-                            <span>Busy Mom</span>
+                    <div class="testimonial-card testimonial-up" style="animation-delay: 0s;">
+                        <div class="card-shine"></div>
+                        <div class="review-score">★★★★★</div>
+                        <p class="quote">"Their weekly service has been a game-changer for my sanity!"</p>
+                        <div class="user-info">
+                            <div class="avatar avatar-db">DB</div>
+                            <div class="name-meta">
+                                <h3>Dharni Bhrambhatt</h3>
+                                <span>Chennai</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="stars">★★★★★</div>
-                    <p class="quote">"With three kids and a full-time job, I needed help. Their weekly service has been a game-changer for my sanity!"</p>
+
+                    <div class="testimonial-card testimonial-down" style="animation-delay: 0s;">
+                        <div class="card-shine"></div>
+                        <div class="review-score">★★★★★</div>
+                        <p class="quote">"Commercial cleaning service is reliable and professional!"</p>
+                        <div class="user-info">
+                            <div class="avatar avatar-rp">RP</div>
+                            <div class="name-meta">
+                                <h3>Rajesh Patel</h3>
+                                <span>Ghaziabad</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="testimonial-card testimonial-up" style="animation-delay: 0s;">
+                        <div class="card-shine"></div>
+                        <div class="review-score">★★★★★</div>
+                        <p class="quote">"Amazing team! My home feels brand new every time!"</p>
+                        <div class="user-info">
+                            <div class="avatar avatar-sp">SP</div>
+                            <div class="name-meta">
+                                <h3>Sneha Prabhu</h3>
+                                <span>Indore</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Duplicate for seamless loop -->
+                    <div class="testimonial-card testimonial-up" style="animation-delay: 0s;">
+                        <div class="card-shine"></div>
+                        <div class="review-score">★★★★★</div>
+                        <p class="quote">"DirtFree transformed my home! Their attention to detail is incredible."</p>
+                        <div class="user-info">
+                            <div class="avatar avatar-kk">KK</div>
+                            <div class="name-meta">
+                                <h3>Kamal Kayada</h3>
+                                <span>Ahmedabad</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats row -->
+            <div class="reviews-stats">
+                <div class="stat">
+                    <strong>4.9★</strong>
+                    <span>Avg Rating</span>
+                </div>
+                <div class="stat">
+                    <strong>500+</strong>
+                    <span>Reviews</span>
+                </div>
+                <div class="stat">
+                    <strong>99%</strong>
+                    <span>Satisfaction</span>
                 </div>
             </div>
         </div>
@@ -364,6 +434,7 @@
                         <li><a href="index.html#services">Services</a></li>
                         <li><a href="index.html#about">About</a></li>
                         <li><a href="index.html#faq">FAQ</a></li>
+                        <li><a href="admin.html">Admin</a></li>
                         <li><a href="service.html">Book Now</a></li>
                     </ul>
                 </div>
