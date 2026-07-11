@@ -1,53 +1,15 @@
-// Cart Management System with Supabase Integration
+// Cart Management System
 class CartManager {
   constructor() {
     this.cartKey = 'dirtfree_cart';
     this.locationKey = 'dirtfree_location';
+    this.usersKey = 'dirtfree_auth_users';
     this.authStateKey = 'dirtfree_auth_state';
     this.ordersKey = 'dirtfree_order_history';
     this.authModal = null;
     this.historyModal = null;
     this.pendingAuthAction = null;
-    this.supabase = null;
-    this.currentUser = null;
-    this.initSupabase();
     this.addButtonStyles();
-  }
-
-  async initSupabase() {
-    // Wait for supabase client to be available
-    let attempts = 0;
-    while (!window.supabase && attempts < 10) {
-      await new Promise(resolve => setTimeout(resolve, 100));
-      attempts++;
-    }
-    this.supabase = window.supabase;
-    if (this.supabase) {
-      // Check if user is already logged in via Supabase session
-      await this.checkSupabaseSession();
-    }
-  }
-
-  async checkSupabaseSession() {
-    if (!this.supabase) return;
-    try {
-      const { data: { user } } = await this.supabase.auth.getUser();
-      if (user) {
-        // Fetch user details from user table
-        const { data, error } = await this.supabase
-          .from('user')
-          .select('*')
-          .eq('id', user.id)
-          .single();
-
-        if (!error && data) {
-          this.currentUser = data;
-          this.setCurrentUser(data);
-        }
-      }
-    } catch (error) {
-      console.log('No active session');
-    }
   }
 
   addButtonStyles() {
@@ -156,34 +118,31 @@ class CartManager {
       }
 
       .auth-nav-pill {
-        min-height: 40px;
-        border: 1px solid #dadce0;
-        background: #ffffff;
-        color: #1a73e8;
-        border-radius: 7px;
-        padding: 0 16px;
-        font-size: 14px;
+        border: 1px solid #dbeafe;
+        background: #f8fbff;
+        color: #2563eb;
+        border-radius: 999px;
+        padding: 8px 14px;
+        font-size: 13px;
         font-weight: 700;
         cursor: pointer;
-        transition: background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+        transition: all 0.2s ease;
         white-space: nowrap;
       }
 
       .auth-nav-pill:hover {
-        background: #f8fbff;
-        border-color: #1a73e8;
+        background: #eef6ff;
+        transform: translateY(-1px);
       }
 
       .auth-nav-pill.auth-primary {
-        background: #ffffff;
-        color: #1a73e8;
-        border-color: #dadce0;
+        background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+        color: white;
+        border-color: transparent;
       }
 
       .auth-nav-pill.auth-primary:hover {
-        background: #f8fbff;
-        color: #1a73e8;
-        border-color: #1a73e8;
+        background: linear-gradient(135deg, #357ABD 0%, #245b95 100%);
       }
 
       .nav-menu .auth-nav-actions .auth-nav-pill,
@@ -411,32 +370,6 @@ class CartManager {
         color: #64748b;
       }
 
-      .history-items {
-        display: grid;
-        gap: 6px;
-        margin: 10px 0;
-        padding: 10px;
-        border-radius: 10px;
-        background: #fff;
-      }
-
-      .history-item {
-        display: flex;
-        justify-content: space-between;
-        gap: 12px;
-        font-size: 12px;
-        color: #334155;
-      }
-
-      .history-item-name {
-        font-weight: 700;
-      }
-
-      .history-item-detail {
-        color: #64748b;
-        white-space: nowrap;
-      }
-
       .history-empty {
         padding: 20px;
         text-align: center;
@@ -445,30 +378,17 @@ class CartManager {
         border-radius: 14px;
       }
 
-      .nav-link {
-        color: #334155;
-        text-decoration: none;
-        font-weight: 600;
-        font-size: 15px;
-        transition: color 0.2s ease;
-        cursor: pointer;
-      }
-
-      .nav-link:hover {
-        color: #2563eb;
-      }
-
-      .nav-menu .auth-user-wrap {
-        position: relative;
-        display: inline-block;
-      }
-
       @media (max-width: 768px) {
         .book-now-btn[data-tooltip-enabled="true"]:disabled::after,
         .book-now-btn[data-tooltip-enabled="true"].disabled::after {
           white-space: normal;
           width: 120px;
           font-size: 12px;
+        }
+
+        .auth-nav-actions {
+          margin-right: 0;
+          margin-bottom: 6px;
         }
       }
     `;
@@ -577,6 +497,15 @@ class CartManager {
   }
 }
 
+CartManager.prototype.getUsers = function() {
+  const users = localStorage.getItem(this.usersKey);
+  return users ? JSON.parse(users) : [];
+};
+
+CartManager.prototype.saveUsers = function(users) {
+  localStorage.setItem(this.usersKey, JSON.stringify(users));
+};
+
 CartManager.prototype.getCurrentUser = function() {
   const stored = localStorage.getItem(this.authStateKey);
   return stored ? JSON.parse(stored) : null;
@@ -587,14 +516,7 @@ CartManager.prototype.isAuthenticated = function() {
 };
 
 CartManager.prototype.setCurrentUser = function(user) {
-  const mappedUser = {
-    id: user.id,
-    firstName: user.first_name || '',
-    lastName: user.last_name || '',
-    mobile: user.mobile,
-    displayName: [user.first_name, user.last_name].filter(Boolean).join(' ').trim() || 'Customer'
-  };
-  localStorage.setItem(this.authStateKey, JSON.stringify(mappedUser));
+  localStorage.setItem(this.authStateKey, JSON.stringify(user));
   this.updateAuthControls();
 };
 
@@ -603,76 +525,45 @@ CartManager.prototype.clearCurrentUser = function() {
   this.updateAuthControls();
 };
 
-CartManager.prototype.registerUser = async function(phone, password, firstName = '', lastName = '') {
+CartManager.prototype.findUserByPhone = function(phone) {
+  return this.getUsers().find(user => user.phone === phone);
+};
+
+CartManager.prototype.registerUser = function(phone, password, firstName = '', lastName = '') {
+  const users = this.getUsers();
+  if (this.findUserByPhone(phone)) {
+    return { success: false, message: 'This mobile number is already registered.' };
+  }
+
   const displayName = [firstName, lastName].filter(Boolean).join(' ').trim() || 'Customer';
-
-  try {
-    // Check if user already exists
-    const { data: existingUser, error: checkError } = await this.supabase
-      .from('user')
-      .select('*')
-      .eq('mobile', phone)
-      .single();
-
-    if (existingUser) {
-      return { success: false, message: 'This mobile number is already registered.' };
-    }
-
-    // Insert into user table directly
-    const { data, error } = await this.supabase
-      .from('user')
-      .insert([{
-        first_name: firstName,
-        last_name: lastName,
-        mobile: phone,
-        password,
-        created_at: new Date().toISOString()
-      }])
-      .select()
-      .single();
-
-    if (error) {
-      return { success: false, message: error.message };
-    }
-
-    this.currentUser = data;
-    this.setCurrentUser(data);
-    return { success: true, user: data };
-  } catch (error) {
-    return { success: false, message: error.message };
-  }
+  const user = {
+    id: Date.now(),
+    phone,
+    password,
+    firstName,
+    lastName,
+    displayName,
+    createdAt: new Date().toISOString()
+  };
+  users.push(user);
+  this.saveUsers(users);
+  this.setCurrentUser(user);
+  return { success: true, user };
 };
 
-CartManager.prototype.loginUser = async function(phone, password) {
-  try {
-    // Fetch user details from user table
-    const { data, error } = await this.supabase
-      .from('user')
-      .select('*')
-      .eq('mobile', phone)
-      .eq('password', password)
-      .single();
+CartManager.prototype.loginUser = function(phone, password) {
+  const users = this.getUsers();
+  const match = users.find(user => user.phone === phone && user.password === password);
 
-    if (error || !data) {
-      return { success: false, message: 'Invalid mobile number or password.' };
-    }
-
-    this.currentUser = data;
-    this.setCurrentUser(data);
-    return { success: true, user: data };
-  } catch (error) {
-    return { success: false, message: error.message };
+  if (!match) {
+    return { success: false, message: 'Invalid mobile number or password.' };
   }
+
+  this.setCurrentUser(match);
+  return { success: true, user: match };
 };
 
-CartManager.prototype.logoutUser = async function() {
-  if (this.supabase) {
-    try {
-      await this.supabase.auth.signOut();
-    } catch (error) {
-      console.log('Sign out error:', error);
-    }
-  }
+CartManager.prototype.logoutUser = function() {
   this.clearCurrentUser();
 };
 
@@ -688,100 +579,31 @@ CartManager.prototype.runPendingAuthAction = function() {
   }
 };
 
-CartManager.prototype.saveOrderToHistory = async function(orderData) {
+CartManager.prototype.saveOrderToHistory = function(orderData) {
   const currentUser = this.getCurrentUser();
-  if (!currentUser) {
-    return { saved: false, error: new Error('Please sign in before placing an order.') };
-  }
+  if (!currentUser) return null;
 
-  if (!this.supabase) {
-    return { saved: false, error: new Error('Supabase is not ready. Please reload the page and try again.') };
-  }
+  const history = JSON.parse(localStorage.getItem(this.ordersKey) || '[]');
+  const entry = {
+    id: `DF-${Date.now()}`,
+    userPhone: currentUser.phone,
+    createdAt: new Date().toISOString(),
+    ...orderData
+  };
 
-  try {
-    const { data, error } = await this.supabase
-      .from('orders')
-      .insert([{
-        user_id: currentUser.id,
-        service: orderData.service,
-        location: orderData.location,
-        date: orderData.date,
-        slot: orderData.slot,
-        total: orderData.total,
-        // The current orders.cart_items column is varchar, so store the cart
-        // array as JSON text. (Use a jsonb column if you later need to query
-        // individual cart items in SQL.)
-        cart_items: JSON.stringify(orderData.cartItems),
-        created_at: new Date().toISOString()
-      }])
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Error saving order:', error);
-      // Fallback to localStorage
-      const history = JSON.parse(localStorage.getItem(this.ordersKey) || '[]');
-      const entry = {
-        id: `DF-${Date.now()}`,
-        userPhone: currentUser.mobile,
-        createdAt: new Date().toISOString(),
-        ...orderData
-      };
-      history.unshift(entry);
-      localStorage.setItem(this.ordersKey, JSON.stringify(history));
-      return { saved: false, data: entry, error };
-    }
-
-    return { saved: true, data };
-  } catch (error) {
-    console.error('Order save error:', error);
-    return { saved: false, error };
-  }
+  history.unshift(entry);
+  localStorage.setItem(this.ordersKey, JSON.stringify(history));
+  return entry;
 };
 
-CartManager.prototype.getOrderHistory = async function() {
+CartManager.prototype.getOrderHistory = function() {
   const currentUser = this.getCurrentUser();
   if (!currentUser) return [];
 
-  try {
-    const { data, error } = await this.supabase
-      .from('orders')
-      .select('*')
-      .eq('user_id', currentUser.id)
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error('Error fetching orders:', error);
-      // Fallback to localStorage
-      const history = JSON.parse(localStorage.getItem(this.ordersKey) || '[]');
-      return history.filter(entry => entry.userPhone === currentUser.mobile);
-    }
-
-    return data || [];
-  } catch (error) {
-    console.error('Order fetch error:', error);
-    return [];
-  }
-};
-
-CartManager.prototype.getOrderCartItems = function(order) {
-  const rawItems = order.cart_items ?? order.cartItems;
-
-  if (Array.isArray(rawItems)) return rawItems;
-  if (typeof rawItems !== 'string') return [];
-
-  try {
-    const parsedItems = JSON.parse(rawItems);
-    return Array.isArray(parsedItems) ? parsedItems : [];
-  } catch {
-    return [];
-  }
-};
-
-CartManager.prototype.escapeHistoryText = function(value) {
-  const element = document.createElement('div');
-  element.textContent = String(value ?? '—');
-  return element.innerHTML;
+  const history = JSON.parse(localStorage.getItem(this.ordersKey) || '[]');
+  return history
+    .filter(entry => entry.userPhone === currentUser.phone)
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 };
 
 CartManager.prototype.initAuthUI = function() {
@@ -834,7 +656,7 @@ CartManager.prototype.initAuthUI = function() {
     button.addEventListener('click', () => this.setAuthMode(button.dataset.mode));
   });
 
-  modal.querySelector('#dirtfreeAuthForm').addEventListener('submit', async (event) => {
+  modal.querySelector('#dirtfreeAuthForm').addEventListener('submit', (event) => {
     event.preventDefault();
     const phone = modal.querySelector('#authPhone').value.trim();
     const password = modal.querySelector('#authPassword').value.trim();
@@ -844,9 +666,9 @@ CartManager.prototype.initAuthUI = function() {
 
     let result;
     if (mode === 'signup') {
-      result = await this.registerUser(phone, password, firstName, lastName);
+      result = this.registerUser(phone, password, firstName, lastName);
     } else {
-      result = await this.loginUser(phone, password);
+      result = this.loginUser(phone, password);
     }
 
     const messageNode = modal.querySelector('#authMessage');
@@ -914,101 +736,84 @@ CartManager.prototype.updateAuthControls = function() {
   const navMenu = document.querySelector('.nav-menu');
   if (!navMenu) return;
 
-  // Remove existing Order History link if present
-  const oldHistoryLink = document.getElementById('orderHistoryNavLink');
-  if (oldHistoryLink) oldHistoryLink.remove();
-
-  // Remove existing auth user wrap if present
-  const oldUserWrap = document.getElementById('authUserWrap');
-  if (oldUserWrap) oldUserWrap.remove();
-
-  // Remove existing sign in button if present
-  const oldSignIn = document.getElementById('signInNavBtn');
-  if (oldSignIn) oldSignIn.remove();
+  let authContainer = document.getElementById('authNavActions');
+  if (!authContainer) {
+    authContainer = document.createElement('div');
+    authContainer.id = 'authNavActions';
+    authContainer.className = 'auth-nav-actions';
+    navMenu.insertBefore(authContainer, navMenu.firstChild);
+  }
 
   const currentUser = this.getCurrentUser();
-
-  // Always add Order History link (before Services/About)
-  const historyLink = document.createElement('a');
-  historyLink.id = 'orderHistoryNavLink';
-  historyLink.href = '#';
-  historyLink.className = 'nav-link';
-  historyLink.textContent = 'Order History';
-  historyLink.addEventListener('click', (e) => {
-    e.preventDefault();
-    this.showOrderHistory();
-  });
-
-  // Find where to insert (after Services link)
-  const servicesLink = navMenu.querySelector('a[href="#services"]');
-  if (servicesLink && servicesLink.nextElementSibling) {
-    servicesLink.parentNode.insertBefore(historyLink, servicesLink.nextElementSibling);
-  } else if (servicesLink) {
-    servicesLink.parentNode.appendChild(historyLink);
-  }
-
-  // Add auth controls at the end
   if (currentUser) {
-    const userWrap = document.createElement('div');
-    userWrap.id = 'authUserWrap';
-    userWrap.className = 'auth-user-wrap';
-    userWrap.innerHTML = `
-      <button class="auth-nav-pill auth-primary" id="userNavBtn" type="button">${currentUser.firstName || currentUser.displayName || 'Customer'}</button>
-      <div class="auth-user-dropdown" id="authUserDropdown">
-        <div class="profile-card">
-          <div class="profile-name">${currentUser.firstName || currentUser.displayName || 'Customer'}</div>
-          <div class="profile-phone">${currentUser.mobile || currentUser.phone}</div>
+    authContainer.innerHTML = `
+      <button class="auth-nav-pill" id="historyNavBtn" type="button">Order History</button>
+      <div class="auth-user-wrap">
+        <button class="auth-nav-pill auth-primary" id="userNavBtn" type="button">${currentUser.displayName || 'Customer'}</button>
+        <div class="auth-user-dropdown" id="authUserDropdown">
+          <div class="profile-card">
+            <div class="profile-name">${currentUser.displayName || 'Customer'}</div>
+            <div class="profile-phone">${currentUser.phone}</div>
+          </div>
+          <button type="button" id="authProfileBtn">Profile</button>
+          <button type="button" id="authLogoutBtn">Logout</button>
         </div>
-        <button type="button" id="authProfileBtn">Profile</button>
-        <button type="button" id="authLogoutBtn">Logout</button>
       </div>
     `;
-    navMenu.appendChild(userWrap);
-
-    const userButton = userWrap.querySelector('#userNavBtn');
-    const dropdown = userWrap.querySelector('#authUserDropdown');
-    const logoutButton = userWrap.querySelector('#authLogoutBtn');
-    const profileButton = userWrap.querySelector('#authProfileBtn');
-
-    if (userButton && dropdown) {
-      userButton.addEventListener('click', (event) => {
-        event.stopPropagation();
-        userWrap.classList.toggle('open');
-      });
-
-      document.addEventListener('click', (event) => {
-        if (!userWrap.contains(event.target)) {
-          userWrap.classList.remove('open');
-        }
-      });
-    }
-
-    if (profileButton) {
-      profileButton.addEventListener('click', () => {
-        userWrap.classList.remove('open');
-        this.showOrderHistory();
-      });
-    }
-
-    if (logoutButton) {
-      logoutButton.addEventListener('click', async () => {
-        await this.logoutUser();
-        userWrap.classList.remove('open');
-      });
-    }
   } else {
-    const signInBtn = document.createElement('button');
-    signInBtn.id = 'signInNavBtn';
-    signInBtn.className = 'auth-nav-pill auth-primary';
-    signInBtn.type = 'button';
-    signInBtn.textContent = 'Sign In';
-    signInBtn.addEventListener('click', () => this.showAuthModal('signin'));
-    navMenu.appendChild(signInBtn);
+    authContainer.innerHTML = `
+      <button class="auth-nav-pill" id="historyNavBtn" type="button">Order History</button>
+      <button class="auth-nav-pill auth-primary" id="signinNavBtn" type="button">Sign In</button>
+    `;
   }
 
+  const historyButton = authContainer.querySelector('#historyNavBtn');
+  if (historyButton) {
+    historyButton.addEventListener('click', () => this.showOrderHistory());
+  }
+
+  const signinButton = authContainer.querySelector('#signinNavBtn');
+  if (signinButton) {
+    signinButton.addEventListener('click', () => this.showAuthModal('signin'));
+  }
+
+  const userButton = authContainer.querySelector('#userNavBtn');
+  const userWrap = authContainer.querySelector('.auth-user-wrap');
+  const dropdown = authContainer.querySelector('#authUserDropdown');
+  const logoutButton = authContainer.querySelector('#authLogoutBtn');
+  const profileButton = authContainer.querySelector('#authProfileBtn');
+
+  if (userButton && userWrap && dropdown) {
+    userButton.addEventListener('click', (event) => {
+      event.stopPropagation();
+      userWrap.classList.toggle('open');
+    });
+
+    document.addEventListener('click', (event) => {
+      if (!userWrap.contains(event.target)) {
+        userWrap.classList.remove('open');
+      }
+    });
+  }
+
+  if (profileButton) {
+    profileButton.addEventListener('click', () => {
+      const currentUser = this.getCurrentUser();
+      if (!currentUser) return;
+      userWrap.classList.remove('open');
+      this.showOrderHistory();
+    });
+  }
+
+  if (logoutButton) {
+    logoutButton.addEventListener('click', () => {
+      this.logoutUser();
+      userWrap.classList.remove('open');
+    });
+  }
 };
 
-CartManager.prototype.showOrderHistory = async function() {
+CartManager.prototype.showOrderHistory = function() {
   if (!this.historyModal) {
     const modal = document.createElement('div');
     modal.className = 'history-overlay';
@@ -1039,41 +844,19 @@ CartManager.prototype.showOrderHistory = async function() {
     return;
   }
 
-  list.innerHTML = '<div class="history-empty">Loading orders...</div>';
-  const orders = await this.getOrderHistory();
-
-  if (!orders || orders.length === 0) {
+  const orders = this.getOrderHistory();
+  if (!orders.length) {
     list.innerHTML = '<div class="history-empty">No orders yet. Your first booking will appear here.</div>';
   } else {
-    list.innerHTML = orders.map(order => {
-      const cartItems = this.getOrderCartItems(order);
-      const totalServices = cartItems.reduce((count, item) => count + (Number(item.quantity) || 1), 0);
-      const bookingTitle = totalServices
-        ? `Booking · ${totalServices} service${totalServices === 1 ? '' : 's'}`
-        : 'Cleaning booking';
-      const itemsMarkup = cartItems.length
-        ? `<div class="history-items">${cartItems.map(item => {
-            const quantity = Number(item.quantity) || 1;
-            const itemName = item.tier || item.service || 'Cleaning service';
-            const price = Number(item.price) || 0;
-            return `<div class="history-item">
-              <span class="history-item-name">${this.escapeHistoryText(itemName)}</span>
-              <span class="history-item-detail">${quantity} × ₹${price}</span>
-            </div>`;
-          }).join('')}</div>`
-        : '';
-
-      return `
-        <div class="history-card">
-          <div class="title">${bookingTitle}</div>
-          <div class="meta">Order ID: ${this.escapeHistoryText(order.id)}</div>
-          <div class="meta">Location: ${this.escapeHistoryText(order.location)}</div>
-          <div class="meta">Date: ${this.escapeHistoryText(order.date)} • ${this.escapeHistoryText(order.slot)}</div>
-          ${itemsMarkup}
-          <div class="meta">Total: ₹${this.escapeHistoryText(order.total || 0)}</div>
-        </div>
-      `;
-    }).join('');
+    list.innerHTML = orders.map(order => `
+      <div class="history-card">
+        <div class="title">${order.service || 'Cleaning booking'}</div>
+        <div class="meta">Order ID: ${order.id}</div>
+        <div class="meta">Location: ${order.location || '—'}</div>
+        <div class="meta">Date: ${order.date || '—'} • ${order.slot || '—'}</div>
+        <div class="meta">Total: ₹${order.total || 0}</div>
+      </div>
+    `).join('');
   }
 
   this.historyModal.classList.add('active');
@@ -1121,33 +904,6 @@ function initMobileNavbar() {
       toggle.setAttribute('aria-label', 'Open navigation menu');
     }
   });
-
-  initAdaptiveNavbarTheme(header);
-}
-
-function initAdaptiveNavbarTheme(header) {
-  const darkSections = document.querySelectorAll('[data-nav-theme="dark"]');
-  if (!header || darkSections.length === 0 || !('IntersectionObserver' in window)) return;
-
-  const setHeaderTheme = () => {
-    // The header is visually over a dark section while its bottom edge falls
-    // within that section. This keeps its text readable while scrolling.
-    const headerBottom = header.getBoundingClientRect().bottom;
-    const isOnDarkSection = Array.from(darkSections).some((section) => {
-      const bounds = section.getBoundingClientRect();
-      return bounds.top <= headerBottom && bounds.bottom > headerBottom;
-    });
-    header.classList.toggle('is-on-dark', isOnDarkSection);
-  };
-
-  const observer = new IntersectionObserver(setHeaderTheme, {
-    threshold: [0, 0.01, 1]
-  });
-
-  darkSections.forEach((section) => observer.observe(section));
-  window.addEventListener('scroll', setHeaderTheme, { passive: true });
-  window.addEventListener('resize', setHeaderTheme);
-  setHeaderTheme();
 }
 
 // Update cart badge count

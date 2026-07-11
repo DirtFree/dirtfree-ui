@@ -8,24 +8,25 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-        <link rel="preload" as="image" href="Images/DF.jpg">
         <link rel="stylesheet" href="style.css">
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     </head>
     <body>
 
         <header class="main-header">
             <div class="header-container">
             <a href="index.html" class="logo-link">
-        <div class="logo">
-            <div class="logo-img">
-                <svg viewBox="0 0 100 100" width="35" height="35">
-                    <circle cx="50" cy="50" r="48" fill="#4A90E2" />
-                    <path d="M50 20 L50 70 M30 70 L70 70 M35 75 L65 75 M40 80 L60 80" stroke="white" stroke-width="6" stroke-linecap="round"/>
-                </svg>
-            </div>
-            <span class="brand-name">DirtFree</span>
-        </div>
-    </a>
+                <div class="logo">
+                    <div class="logo-img">
+                        <svg viewBox="0 0 100 100" width="40" height="40" aria-hidden="true">
+                            <circle cx="50" cy="50" r="48" fill="#4A90E2" />
+                            <path d="M50 20 L50 70 M30 70 L70 70 M35 75 L65 75 M40 80 L60 80" stroke="white" stroke-width="6" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <div class="logo-text">DIRTFREE</div>
+                    <div class="logo-tagline">PERFECT SAFAI, HAR BAAR</div>
+                </div>
+            </a>
 
                 <nav class="nav-menu">
                     <div class="city-picker" id="cityPicker">
@@ -49,53 +50,54 @@
                         </div>
                     </div>
 
-                <a href="#services">Services</a>
-                <a href="#about">About</a>
-                <!-- <a href="#pricing">Pricing</a> -->
-                <a href="#faq">FAQ</a>
-                <a href="#contact">Contact</a>
-                <a href="#" id="bookNowBtn" class="card-btn book-now-btn disabled" title="Select a location first">Book Now</a>
-            </nav>
+                    <a href="index.html" class="nav-home-link">Home</a>
+                    <a href="#services">Services</a>
+                    <a href="#about">About</a>
+                    <!-- <a href="#pricing">Pricing</a> -->
+                    <a href="#faq">FAQ</a>
+                    <a href="#contact">Contact</a>
+                    <a href="#" id="bookNowBtn" class="card-btn book-now-btn disabled" title="Select a location first">Book Now</a>
+                </nav>
         </div>
     </header>
 
-        <section class="hero-section" style="background-image: url('Images/DF.jpg');">
+        <section class="hero-section" data-nav-theme="dark">
             <div class="hero-overlay"></div>
-            <div class="hero-content">
-                <span class="badge">Professional Cleaning Services</span>
-                <h1>Spotless Homes.<br><span class="text-green">Stress-Free</span> Living.</h1>
-                <p class="hero-desc">
-                    Professional cleaning services that transform your space into a sanctuary. 
-                    Eco-friendly products, trusted team, exceptional results.
-                </p>
+            <div class="hero-shell">
+                <div class="hero-content">
+                    <span class="badge">✦ Trusted home cleaning, made simple</span>
+                    <h1>Professional <span class="text-green">Cleaning</span> Services for your home.</h1>
+                    <p class="hero-desc">
+                        Expert cleaning with clear pricing, trusted professionals, and a spotless finish—on your schedule. Coming soon: DirtFree mobile app for Android and iOS.
+                    </p>
 
-                <div class="cta-group">
-                    <!-- <a href="#" class="btn btn-filled">Get Free Quote &rarr;</a> -->
-                    <a href="#services" class="btn btn-outline">View Services</a>
+                    <div class="cta-group">
+                        <a href="#services" class="btn btn-outline">Explore Services</a>
+                    </div>
+
+                    <div class="city-quick-links">
+                        <p>Choose your city to get started</p>
+                        <div class="city-tags">
+                            <button class="city-btn" data-url="ahmedabad.html">Ahmedabad</button>
+                            <button class="city-btn" data-url="betul.html">Betul</button>
+                            <button class="city-btn" data-url="chennai.html">Chennai</button>
+                            <button class="city-btn" data-url="ghaziabad.html">Ghaziabad</button>
+                            <button class="city-btn" data-url="indore.html">Indore</button>
+                        </div>
+                    </div>
+
+                    <div class="hero-stats" aria-label="DirtFree service highlights">
+                        <div><strong>5 Cities</strong><span>Ready to serve</span></div>
+                        <div><strong>5★</strong><span>Quality focused</span></div>
+                        <div><strong>Same-day</strong><span>Slots available</span></div>
+                    </div>
                 </div>
-            
-                <div style="display: flex; flex-direction: column; gap: 40px; width: 100%; align-items: flex-start; margin-top: 50px;">
 
-        <div class="city-quick-links" style="position: relative; margin: 0;">
-            <p>Select your city to explore services:</p>
-            <div class="city-tags">
-                <button class="city-btn" data-url="ahmedabad.html">Ahmedabad</button>
-                <button class="city-btn" data-url="betul.html">Betul</button>
-                <button class="city-btn" data-url="chennai.html">Chennai</button>
-                <button class="city-btn" data-url="ghaziabad.html">Ghaziabad</button>
-                <button class="city-btn" data-url="indore.html">Indore</button>
+                <div class="hero-visual" aria-hidden="true">
+                    <!-- Replace this image with your hero photo. Keep the file in Images/ and update the src below. -->
+                    <img class="hero-photo" src="Images/banner_final.png" alt="DirtFree app showcase" /> 
+                </div>
             </div>
-        </div>
-
-        <div class="info-bar" style="position: static; transform: none; width: 100%; margin: 0; box-sizing: border-box;">
-            <div class="info-item"><span>🌿</span> Eco-Friendly Products</div>
-            <div class="info-item"><span>🛡️</span> Insured & Bonded</div>
-            <div class="info-item"><span>⭐</span> 5-Star Rated</div>
-            <div class="info-item"><span>🕒</span> Same-Day Service</div>
-            <div class="info-item"><span>✅</span> 100% Satisfaction</div>
-        </div>
-
-    </div>
         </section>
 
         <section id="services" class="services-section">
@@ -333,6 +335,7 @@
         </div>
     </section>
 
+   <script src="/supabase-config.js" defer></script>
    <script src="/cart.js" defer></script>
 <script src="/script.js" defer></script>
     <footer class="site-footer" id="contact">

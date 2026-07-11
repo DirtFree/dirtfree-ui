@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         .booking-container {
             max-width: 1200px;
@@ -454,6 +455,7 @@
         </div>
     </div>
 
+    <script src="/supabase-config.js"></script>
     <script src="/cart.js"></script>
     <script>
         // Render cart preview on the right side
@@ -610,8 +612,20 @@
             renderCartPreview();
             setupBookingAvailability();
 
-            form.addEventListener('submit', async function(e) {
-                e.preventDefault();
+            const submitBooking = async function(e) {
+                if (e) e.preventDefault();
+
+                if (!cart.isAuthenticated()) {
+                    cart.queueAfterAuth(() => {
+                        if (typeof form.requestSubmit === 'function') {
+                            form.requestSubmit();
+                        } else {
+                            form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+                        }
+                    });
+                    cart.showAuthModal('signin');
+                    return;
+                }
 
                 const location = cart.getLocation();
                 if (!location) {
@@ -639,8 +653,6 @@
                 // Get cart items
                 const cartItems = cart.getCart();
                 const cartSummary = buildCartSummary(cartItems);
-
-
                 const totalAmount = cart.getCartTotal();
                 const orderId = `DF-${Date.now()}`;
                 const bookingTimestamp = new Date().toISOString();
@@ -650,9 +662,32 @@
                     'Chennai': '917470625893',
                     'Ghaziabad': '917303489008',
                     'Indore': '917828597277'
-                }; 
-// add numbers properly
+                };
                 const cityNumber = locationMap[location] || '917828597277';
+
+                const orderData = {
+                    id: orderId,
+                    service: cartItems[0]?.tier || 'Cleaning Service',
+                    location,
+                    name,
+                    phone,
+                    address,
+                    date,
+                    slot,
+                    total: totalAmount,
+                    cartItems: cartItems,
+                    createdAt: bookingTimestamp
+                };
+
+                // Wait for the database write before confirming the order.
+                const orderSaveResult = await cart.saveOrderToHistory(orderData);
+                if (!orderSaveResult.saved) {
+                    console.error('Failed to save order:', orderSaveResult.error);
+                    alert(`Your order could not be saved to Supabase. ${orderSaveResult.error?.message || 'Please try again.'}`);
+                    return;
+                }
+
+                console.log('Order saved to database successfully:', orderSaveResult.data.id);
 
                 // Prepare data for Google Sheets
                 const params = new URLSearchParams();
@@ -676,11 +711,11 @@
                 })
                     .then(res => res.text())
                     .then(data => {
-                     console.log("Response:", data);
-                })
+                        console.log('Response:', data);
+                    })
                     .catch(err => {
-                    console.error("Error:", err);
-                });
+                        console.error('Error:', err);
+                    });
 
                 // Construct WhatsApp message
                 const msg = `*New DirtFree Booking*\n\n` +
@@ -700,10 +735,13 @@
                 // Clear cart after successful order
                 setTimeout(() => {
                     cart.clearCart();
+                    renderCartPreview();
                     alert('Order placed successfully! Check your WhatsApp for confirmation.');
                     window.location.href = 'index.html';
                 }, 1000);
-            });
+            };
+
+            form.addEventListener('submit', submitBooking);
         });
     </script>
     <footer class="site-footer" id="contact">
@@ -753,4 +791,3 @@
     </footer>
 </body>
 </html>
-
