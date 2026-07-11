@@ -11,7 +11,8 @@ export default defineConfig({
         chennai: 'chennai.html',
         ghaziabad: 'ghaziabad.html',
         indore: 'indore.html',
-        service: 'service.html'
+        service: 'service.html',
+        admin: 'admin.html'
       }
     }
   }

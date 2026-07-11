@@ -775,7 +775,10 @@ body {
 }
 
 .main-header {
-    background: rgba(255, 255, 255, 0.97);
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    background-clip: padding-box;
 }
 
 .main-header::before,
@@ -3480,7 +3483,10 @@ main-header.is-on-dark {
 }
 
 .main-header {
-    background: rgba(255, 255, 255, 0.97);
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    background-clip: padding-box;
 }
 
 .main-header::before,
