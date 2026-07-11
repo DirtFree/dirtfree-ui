@@ -253,6 +253,13 @@ class CartManager {
         color: #2563eb;
       }
 
+      .profile-subtitle {
+        font-size: 12px;
+        color: #64748b;
+        margin-top: 4px;
+        line-height: 1.4;
+      }
+
       .auth-overlay,
       .history-overlay {
         position: fixed;
@@ -975,15 +982,19 @@ CartManager.prototype.updateAuthControls = function() {
 
   // Add auth controls at the end
   if (currentUser) {
+    const displayName = currentUser.firstName || currentUser.displayName || 'Customer';
+    const formattedPhone = formatDisplayPhone(currentUser.mobile || currentUser.phone || '');
+    const signedInText = formattedPhone ? `Signed in with ${formattedPhone}` : 'Signed in';
+
     const userWrap = document.createElement('div');
     userWrap.id = 'authUserWrap';
     userWrap.className = 'auth-user-wrap';
     userWrap.innerHTML = `
-      <button class="auth-nav-pill auth-primary" id="userNavBtn" type="button">${currentUser.firstName || currentUser.displayName || 'Customer'}</button>
+      <button class="auth-nav-pill auth-primary" id="userNavBtn" type="button">${displayName}</button>
       <div class="auth-user-dropdown" id="authUserDropdown">
         <div class="profile-card">
-          <div class="profile-name">${currentUser.firstName || currentUser.displayName || 'Customer'}</div>
-          <div class="profile-phone">${currentUser.mobile || currentUser.phone}</div>
+          <div class="profile-name">${displayName}</div>
+          <div class="profile-subtitle">${signedInText}</div>
         </div>
         <button type="button" id="authProfileBtn">Profile</button>
         <button type="button" id="authLogoutBtn">Logout</button>
@@ -1031,8 +1042,17 @@ CartManager.prototype.updateAuthControls = function() {
     signInBtn.addEventListener('click', () => this.showAuthModal('signin'));
     navMenu.appendChild(signInBtn);
   }
-
 };
+
+function formatDisplayPhone(rawPhone) {
+  const normalized = String(rawPhone || '').replace(/\D/g, '');
+  if (!normalized) return '';
+  if (normalized.length === 10) return `+91 ${normalized}`;
+  if (normalized.length === 11 && normalized.startsWith('0')) return `+91 ${normalized.slice(1)}`;
+  if (normalized.length === 12 && normalized.startsWith('91')) return `+91 ${normalized.slice(2)}`;
+  if (String(rawPhone).trim().startsWith('+')) return String(rawPhone).trim();
+  return `+91 ${normalized}`;
+}
 
 CartManager.prototype.showOrderHistory = async function() {
   if (!this.historyModal) {

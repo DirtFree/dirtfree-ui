@@ -210,14 +210,15 @@ function showLocationPickerModal() {
     <div class="location-picker-overlay">
       <div class="location-picker-dialog">
         <div class="location-picker-header">
-          <h2>Select Your City</h2>
-          <p>Choose a city to browse available services</p>
+          <h2>Choose a Service Area</h2>
+          <p>We tailor your cleaning options to the city you select.</p>
         </div>
         <div class="location-picker-grid">
           ${CITIES.map(city => `
             <button type="button" class="location-picker-btn" data-location="${city.toLowerCase()}">
-              <span class="location-picker-emoji">📍</span>
-              <span class="location-picker-name">${city}</span>
+              <div class="location-picker-badge">${city.charAt(0)}</div>
+              <div class="location-picker-name">${city}</div>
+              <div class="location-picker-subtitle">Available in ${city}</div>
             </button>
           `).join('')}
         </div>
@@ -285,32 +286,49 @@ function showLocationPickerModal() {
       .location-picker-btn {
         display: flex;
         flex-direction: column;
-        align-items: center;
+        align-items: flex-start;
         justify-content: center;
-        gap: 8px;
-        padding: 20px 16px;
-        border: 2px solid #e2e8f0;
-        border-radius: 12px;
-        background: #f8fafc;
+        gap: 10px;
+        padding: 18px 20px;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        background: #ffffff;
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
         font-family: inherit;
+        text-align: left;
+        min-height: 96px;
       }
 
       .location-picker-btn:hover {
-        border-color: #4a90e2;
-        background: #f0f4ff;
+        border-color: #2563eb;
+        background: #eff6ff;
         transform: translateY(-2px);
+        box-shadow: 0 16px 32px rgba(37, 99, 235, 0.12);
       }
 
-      .location-picker-emoji {
-        font-size: 24px;
+      .location-picker-badge {
+        width: 36px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        background: #e0f2fe;
+        color: #0369a1;
+        font-weight: 700;
+        font-size: 16px;
       }
 
       .location-picker-name {
-        font-size: 14px;
-        font-weight: 600;
+        font-size: 16px;
+        font-weight: 700;
         color: #0f172a;
+      }
+
+      .location-picker-subtitle {
+        font-size: 13px;
+        color: #475569;
       }
 
       @media (max-width: 480px) {
