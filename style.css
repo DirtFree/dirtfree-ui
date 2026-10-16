@@ -417,7 +417,7 @@ body {
 .section-title { font-size: 2.5rem; color: var(--navy); margin-top: 10px; }
 .section-subtitle { max-width: 600px; color: var(--text-grey); font-size: 0.9rem; margin: 0 auto; }
 
-.services-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; }
+.services-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 20px; }
 .service-card { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer; }
 .card-img {
     width: 100%;           /* Or a specific width like 300px */
@@ -838,6 +838,23 @@ body {
     font-size: 14px;
     font-weight: 700;
     transition: background-color 150ms ease, box-shadow 150ms ease;
+}
+
+.nav-menu .service-cart-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.service-cart-link svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.8;
 }
 
 .nav-menu .card-btn::before {
@@ -2510,6 +2527,18 @@ body {
     height: 360px;
     border-radius: 18px;
     isolation: isolate;
+}
+
+@media (min-width: 1200px) {
+    .booking-section .services-container {
+        flex-wrap: nowrap;
+    }
+
+    .booking-section .booking-card {
+        flex: 1 1 0;
+        min-width: 0;
+        width: auto;
+    }
 }
 
 .booking-card::before {

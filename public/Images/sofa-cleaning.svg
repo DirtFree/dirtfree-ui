@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="70" y1="44" x2="830" y2="560" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E8F5FF"/>
+      <stop offset="1" stop-color="#DDF7EF"/>
+    </linearGradient>
+    <linearGradient id="sofa" x1="225" y1="228" x2="680" y2="472" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#4B8DD8"/>
+      <stop offset="1" stop-color="#2359A8"/>
+    </linearGradient>
+    <linearGradient id="cloth" x1="460" y1="248" x2="593" y2="400" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#73E4C4"/>
+      <stop offset="1" stop-color="#18A982"/>
+    </linearGradient>
+    <filter id="shadow" x="106" y="172" width="700" height="362" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="14"/>
+    </filter>
+  </defs>
+  <rect width="900" height="600" rx="36" fill="url(#bg)"/>
+  <circle cx="735" cy="125" r="88" fill="#fff" fill-opacity=".48"/>
+  <circle cx="159" cy="481" r="96" fill="#fff" fill-opacity=".42"/>
+  <path d="M143 468h616" stroke="#B5D4E6" stroke-linecap="round" stroke-width="10"/>
+  <ellipse cx="455" cy="484" fill="#174A66" fill-opacity=".16" rx="294" ry="23" filter="url(#shadow)"/>
+  <path d="M207 326c0-35 28-63 63-63h365c35 0 63 28 63 63v131H207V326Z" fill="url(#sofa)"/>
+  <path d="M171 359c0-29 23-52 52-52h20v152h-72V359Zm484-52h22c29 0 52 23 52 52v100h-74V307Z" fill="#1D4E91"/>
+  <path d="M267 271c0-29 23-52 52-52h110c29 0 52 23 52 52v91H267v-91Zm228 0c0-29 23-52 52-52h48c29 0 52 23 52 52v91H495v-91Z" fill="#75A9E5"/>
+  <path d="M284 360h324v98H284z" fill="#3978C4"/>
+  <path d="M244 456v35m414-35v35" stroke="#754D37" stroke-linecap="round" stroke-width="17"/>
+  <path d="m461 271 37-20 43 24 39 52-53 37-46-51-20-42Z" fill="url(#cloth)"/>
+  <path d="m477 286 42 45m-19-62 42 45" stroke="#D9FFF3" stroke-linecap="round" stroke-width="8" opacity=".8"/>
+  <path d="m549 250 5 15 15 5-15 5-5 15-5-15-15-5 15-5 5-15Zm-354 73 4 12 12 4-12 4-4 12-4-12-12-4 12-4 4-12Zm468-8 5 14 14 5-14 5-5 14-5-14-14-5 14-5 5-14Z" fill="#fff"/>
+  <path d="M728 398c15-19 15-33 0-47-15 14-15 28 0 47Z" fill="#21B887"/>
+</svg>

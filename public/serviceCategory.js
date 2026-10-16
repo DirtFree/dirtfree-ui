@@ -92,6 +92,33 @@ function getServiceDisplayName(serviceName) {
   return getServicesData()[serviceName]?.title || serviceName;
 }
 
+function getDefaultServiceImage(serviceName) {
+  const normalizedName = String(serviceName || '').trim().toLowerCase();
+  if (normalizedName.includes('sofa') || normalizedName.includes('upholstery')) {
+    return 'Images/sofa-cleaning.svg';
+  }
+  if (normalizedName.includes('washroom') || normalizedName.includes('bathroom')) {
+    return 'Images/Kitchen.jpg';
+  }
+  if (normalizedName.includes('kitchen')) {
+    return 'Images/Car.jpg';
+  }
+  if (normalizedName.includes('flat') || normalizedName.includes('home cleaning')) {
+    return 'Images/DF.jpg';
+  }
+  if (normalizedName.includes('car')) {
+    return 'Images/WT.jpg';
+  }
+  if (normalizedName.includes('tank')) {
+    return 'Images/flat.jpg';
+  }
+  if (normalizedName.includes('add-on')) {
+    return 'Images/add-on-services.svg';
+  }
+
+  return 'Images/washroom.jpg';
+}
+
 function resolveServiceName(serviceName) {
   const catalog = getServicesData();
   if (catalog[serviceName]) return serviceName;
@@ -180,7 +207,7 @@ async function fetchServicesFromSupabase() {
         rating: row.rating ?? 4.8,
         reviews: row.reviews || '1K',
         description: row.description || row.details_summary || '',
-        image: row.image || 'Images/washroom.jpg',
+        image: row.image || getDefaultServiceImage(`${category} ${title} ${tierName} ${row.name || ''}`),
         badge: row.badge || '',
         detailsSummary: row.details_summary || row.description || '',
         included: Array.isArray(row.included) ? row.included : [],
