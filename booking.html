@@ -674,7 +674,7 @@
 
                 const orderData = {
                     id: orderId,
-                    service: cartItems[0]?.tier || 'Cleaning Service',
+                    service: cartItems[0]?.service || cartItems[0]?.tier || 'Cleaning Service',
                     location,
                     name,
                     phone,

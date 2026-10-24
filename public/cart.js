@@ -1142,8 +1142,12 @@ function initMobileNavbar() {
   const headerContainer = document.querySelector('.header-container');
   const navMenu = document.querySelector('.nav-menu');
 
-  if (!header || !headerContainer || !navMenu || document.querySelector('.nav-toggle')) return;
+  if (!header) return;
   if (document.body.classList.contains('service-page')) return;
+
+  initAdaptiveNavbarTheme(header);
+
+  if (!headerContainer || !navMenu || document.querySelector('.nav-toggle')) return;
 
   const toggle = document.createElement('button');
   toggle.className = 'nav-toggle';
@@ -1168,7 +1172,6 @@ function initMobileNavbar() {
     }
   });
 
-  initAdaptiveNavbarTheme(header);
 }
 
 function initAdaptiveNavbarTheme(header) {
@@ -1176,12 +1179,10 @@ function initAdaptiveNavbarTheme(header) {
   if (!header || darkSections.length === 0 || !('IntersectionObserver' in window)) return;
 
   const setHeaderTheme = () => {
-    // The header is visually over a dark section while its bottom edge falls
-    // within that section. This keeps its text readable while scrolling.
-    const headerBottom = header.getBoundingClientRect().bottom;
+    const themeProbeY = header.getBoundingClientRect().bottom + 32;
     const isOnDarkSection = Array.from(darkSections).some((section) => {
       const bounds = section.getBoundingClientRect();
-      return bounds.top <= headerBottom && bounds.bottom > headerBottom;
+      return bounds.top <= themeProbeY && bounds.bottom > themeProbeY;
     });
     header.classList.toggle('is-on-dark', isOnDarkSection);
   };

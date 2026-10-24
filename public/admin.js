@@ -1,10 +1,4 @@
 const ADMIN_STATUS_OVERRIDES_KEY = 'dirtfree_admin_status_overrides';
-const orderStatuses = {
-  done: 'Done',
-  completed: 'Done',
-  pending: 'Pending',
-  waiting: 'Pending'
-};
 
 const ADMIN_CITIES = ['Ahmedabad', 'Betul', 'Chennai', 'Ghaziabad', 'Indore'];
 
@@ -41,10 +35,6 @@ function getCustomerName(order) {
   if (fallbackName) return String(fallbackName).trim();
 
   return order.customer_phone || order.phone || order.userPhone || order.user?.mobile || 'Guest';
-}
-
-function getStatusLabel(status) {
-  return orderStatuses[status] || (status === 'done' ? 'Done' : 'Pending');
 }
 
 function escapeHtml(value) {
@@ -173,6 +163,8 @@ function handleAdminLogout() {
 let adminServices = [];
 let serviceTableAvailable = false;
 let serviceLocationFilter = 'all';
+let serviceTitleFilter = 'all';
+let serviceListHeightObserver = null;
 
 function showPanel(panelId) {
   document.querySelectorAll('.admin-panel').forEach(panel => panel.classList.add('hidden'));
@@ -186,8 +178,24 @@ function bindAdminTabs() {
       document.querySelectorAll('.admin-tabs .tab-btn').forEach(tab => tab.classList.remove('active'));
       button.classList.add('active');
       showPanel(button.dataset.panel);
+      if (button.dataset.panel === 'servicesPanel') {
+        requestAnimationFrame(syncServiceListCardHeight);
+      }
     });
   });
+}
+
+function syncServiceListCardHeight() {
+  const formCard = document.querySelector('.service-form-card');
+  const listCard = document.querySelector('.service-list-card');
+  if (!formCard || !listCard) return;
+
+  if (window.matchMedia('(max-width: 980px)').matches) {
+    listCard.style.height = '';
+    return;
+  }
+
+  listCard.style.height = `${Math.ceil(formCard.getBoundingClientRect().height)}px`;
 }
 
 function parseListField(fieldId) {
@@ -268,9 +276,31 @@ function buildServiceLocationOptions(services) {
   serviceLocationFilter = filterNode.value;
 }
 
+function buildServiceTitleOptions(services) {
+  const filterNode = document.getElementById('serviceTitleFilter');
+  if (!filterNode) return;
+
+  const titles = Array.from(new Set(
+    services.map(service => String(service.title || '').trim()).filter(Boolean)
+  )).sort((first, second) => first.localeCompare(second));
+
+  const currentValue = serviceTitleFilter;
+  filterNode.innerHTML = '<option value="all">All titles</option>' + titles.map((title) => (
+    `<option value="${escapeHtml(title)}">${escapeHtml(title)}</option>`
+  )).join('');
+
+  filterNode.value = titles.includes(currentValue) ? currentValue : 'all';
+  serviceTitleFilter = filterNode.value;
+}
+
 function getVisibleServices(services) {
-  if (serviceLocationFilter === 'all') return services;
-  return services.filter((service) => normalizeLocationValue(service.location) === serviceLocationFilter);
+  return services.filter((service) => {
+    const matchesLocation = serviceLocationFilter === 'all'
+      || normalizeLocationValue(service.location) === serviceLocationFilter;
+    const matchesTitle = serviceTitleFilter === 'all'
+      || String(service.title || '').trim() === serviceTitleFilter;
+    return matchesLocation && matchesTitle;
+  });
 }
 
 function renderServiceList(services) {
@@ -278,13 +308,15 @@ function renderServiceList(services) {
   if (!serviceList) return;
 
   const visibleServices = getVisibleServices(services);
+  serviceList.scrollTop = 0;
   serviceList.innerHTML = buildServiceList(visibleServices);
   bindServiceListActions();
 }
 
 function buildServiceList(services) {
   if (!services.length) {
-    return '<div class="no-orders">No services found. Add a new service to get started.</div>';
+    const hasFilters = serviceLocationFilter !== 'all' || serviceTitleFilter !== 'all';
+    return `<div class="no-orders">${hasFilters ? 'No services match these filters. Try another title or location.' : 'No services found. Add a new service to get started.'}</div>`;
   }
 
   return services
@@ -304,6 +336,7 @@ function buildServiceList(services) {
           </div>
           <div class="service-item-actions">
             <button type="button" class="card-btn small" data-action="edit" data-service-id="${service.id}">Edit</button>
+            <button type="button" class="card-btn secondary small" data-action="clone" data-service-id="${service.id}">Clone</button>
             <button type="button" class="card-btn secondary small" data-action="delete" data-service-id="${service.id}">Delete</button>
           </div>
         </article>
@@ -322,6 +355,12 @@ function bindServiceListActions() {
 
       if (action === 'edit') {
         populateServiceForm(service);
+      } else if (action === 'clone') {
+        populateServiceForm(service);
+        document.getElementById('serviceId').value = '';
+        document.getElementById('serviceLocation').value = '';
+        showServiceFormMessage('Service cloned into the form. Choose a location and save to create a new service.', 'info');
+        document.getElementById('serviceForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
       } else if (action === 'delete') {
         deleteService(serviceId);
       }
@@ -387,6 +426,7 @@ async function loadServices() {
   }));
   serviceTableAvailable = true;
   buildServiceLocationOptions(adminServices);
+  buildServiceTitleOptions(adminServices);
   renderServiceList(adminServices);
   showServiceFormMessage('Service catalog loaded.', 'success');
 }
@@ -510,25 +550,48 @@ function buildStatusSection(title, orders, emptyMessage) {
 
 function buildOrderCard(order) {
   const status = getOrderStatus(order);
-  const orderStatus = getStatusLabel(status);
   const isDone = status === 'done' || status === 'completed';
   const orderDate = formatDate(order.created_at || order.date);
   const cartItems = parseCartItems(order);
-  const orderService = order.service || (cartItems.length ? 'Cleaning booking' : 'Cleaning service');
+  const serviceCategories = Array.from(new Set(
+    cartItems.map(item => String(item.service || '').trim()).filter(Boolean)
+  ));
+  const orderService = serviceCategories.length === 1
+    ? serviceCategories[0]
+    : serviceCategories.length > 1
+      ? `${serviceCategories.length} service types`
+      : order.service || 'Cleaning service';
   const total = order.total ? `₹${order.total}` : '—';
+  const serviceCategoriesMarkup = serviceCategories.length > 1
+    ? `<div class="order-service-categories">${serviceCategories.map(category => `<span>${escapeHtml(category)}</span>`).join('')}</div>`
+    : '';
 
   const itemsMarkup = cartItems.length
-    ? `<div class="order-items">
-         <div class="order-items-title">Order items</div>
+    ? `<details class="order-items" ${cartItems.length <= 3 ? 'open' : ''}>
+         <summary class="order-items-summary">
+           <span>Order items</span>
+           <span class="order-items-count">${cartItems.length} ${cartItems.length === 1 ? 'item' : 'items'}</span>
+         </summary>
          <div class="order-items-list">
            ${cartItems.map(item => {
-             const itemName = escapeHtml(item.tier || item.service || item.name || 'Cleaning item');
-             const itemCount = item.quantity ? `${Number(item.quantity)} × ` : '';
-             const itemPrice = item.price ? `₹${item.price}` : '';
-             return `<div class="order-item"><span>${itemName}</span><span>${itemCount}${itemPrice}</span></div>`;
+             const itemCategory = String(item.service || '').trim();
+             const itemTier = String(item.tier || item.name || '').trim();
+             const itemName = itemTier || itemCategory || 'Cleaning item';
+             const parsedQuantity = Number(item.quantity);
+             const quantity = Number.isFinite(parsedQuantity) && parsedQuantity > 0 ? parsedQuantity : 1;
+             const hasPrice = item.price !== null && item.price !== undefined && item.price !== '';
+             const unitPrice = hasPrice ? Number(item.price) : Number.NaN;
+             const lineTotal = Number.isFinite(unitPrice) ? unitPrice * quantity : null;
+             const categoryMarkup = itemCategory
+               ? `<span class="order-item-category">${escapeHtml(itemCategory)}</span>`
+               : '';
+             const priceMarkup = lineTotal === null
+               ? '<span class="order-item-total">Price unavailable</span>'
+               : `<span class="order-item-total"><small>${quantity} × ₹${unitPrice.toLocaleString('en-IN')}</small>₹${lineTotal.toLocaleString('en-IN')}</span>`;
+             return `<div class="order-item"><div class="order-item-info">${categoryMarkup}<span class="order-item-tier">${escapeHtml(itemName)}</span></div>${priceMarkup}</div>`;
            }).join('')}
          </div>
-       </div>`
+       </details>`
     : '';
 
   const addressMarkup = order.address ? `
@@ -544,8 +607,11 @@ function buildOrderCard(order) {
           <div>
             <p class="order-id">Order #${order.id || '—'}</p>
             <h3>${escapeHtml(orderService)}</h3>
+            ${serviceCategoriesMarkup}
           </div>
-          <span class="status-pill ${isDone ? 'status-done' : 'status-pending'}">${orderStatus}</span>
+          <button type="button" data-order-id="${order.id}" data-status="${isDone ? 'pending' : 'done'}" class="status-toggle-btn ${isDone ? 'status-toggle-done' : 'status-toggle-pending'}">
+            ${isDone ? 'Mark Pending' : 'Mark Done'}
+          </button>
         </div>
 
         <div class="order-meta">
@@ -562,11 +628,6 @@ function buildOrderCard(order) {
         </div>
         ${addressMarkup}
       </div>
-      <div class="order-actions">
-        <button type="button" data-order-id="${order.id}" data-status="${isDone ? 'pending' : 'done'}" class="status-toggle-btn">
-          ${isDone ? 'Mark Pending' : 'Mark Done'}
-        </button>
-      </div>
     </article>
   `;
 }
@@ -578,7 +639,10 @@ function renderOrders(orders) {
 
   const filtered = orders.filter(order => {
     const city = (order.location || 'Unknown').trim();
-    const service = (order.service || '').toLowerCase();
+    const service = [order.service, ...parseCartItems(order).map(item => item.service)]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase();
     const idValue = String(order.id || '').toLowerCase();
     const searchMatch = !searchValue || service.includes(searchValue) || idValue.includes(searchValue);
     const cityMatch = cityFilter === 'all' || city === cityFilter;
@@ -692,6 +756,15 @@ async function loadOrders() {
 }
 
 function initAdminDashboard() {
+  syncServiceListCardHeight();
+  if (serviceListHeightObserver) serviceListHeightObserver.disconnect();
+  if ('ResizeObserver' in window) {
+    serviceListHeightObserver = new ResizeObserver(syncServiceListCardHeight);
+    serviceListHeightObserver.observe(document.querySelector('.service-form-card'));
+  } else {
+    window.removeEventListener('resize', syncServiceListCardHeight);
+    window.addEventListener('resize', syncServiceListCardHeight);
+  }
   document.getElementById('cityFilter').addEventListener('change', () => renderOrders(adminOrders));
   document.getElementById('searchInput').addEventListener('input', () => renderOrders(adminOrders));
   document.getElementById('adminLogoutBtn').addEventListener('click', handleAdminLogout);
@@ -699,6 +772,10 @@ function initAdminDashboard() {
   document.getElementById('serviceFormReset').addEventListener('click', clearServiceForm);
   document.getElementById('serviceLocationFilter')?.addEventListener('change', (event) => {
     serviceLocationFilter = event.target.value;
+    renderServiceList(adminServices);
+  });
+  document.getElementById('serviceTitleFilter')?.addEventListener('change', (event) => {
+    serviceTitleFilter = event.target.value;
     renderServiceList(adminServices);
   });
   bindAdminTabs();
