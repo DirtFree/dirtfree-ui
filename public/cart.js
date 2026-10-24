@@ -373,6 +373,19 @@ class CartManager {
         box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.14);
       }
 
+      .auth-forgot-password {
+        align-self: flex-end;
+        color: #357ABD;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+      }
+
+      .auth-forgot-password:hover {
+        color: #245f9e;
+        text-decoration: underline;
+      }
+
       .auth-submit {
         margin-top: 6px;
         border: 0;
@@ -849,6 +862,7 @@ CartManager.prototype.initAuthUI = function() {
         <input id="authPhone" name="phone" type="tel" placeholder="Enter your mobile number" required>
         <label for="authPassword">Password</label>
         <input id="authPassword" name="password" type="password" placeholder="Choose a password" required>
+        <a class="auth-forgot-password" href="mailto:info@dirtfree.in?subject=Password%20recovery%20request">Forgot password? Contact support</a>
         <button class="auth-submit" type="submit">Continue</button>
       </form>
       <p class="auth-message" id="authMessage"></p>
@@ -865,6 +879,15 @@ CartManager.prototype.initAuthUI = function() {
 
   modal.querySelectorAll('.auth-tab').forEach(button => {
     button.addEventListener('click', () => this.setAuthMode(button.dataset.mode));
+  });
+
+  modal.querySelector('.auth-forgot-password').addEventListener('click', (event) => {
+    const phone = modal.querySelector('#authPhone').value.trim();
+    const subject = encodeURIComponent('DirtFree password recovery request');
+    const body = encodeURIComponent(
+      `Please help me recover access to my DirtFree account.\nRegistered mobile number: ${phone || 'Please add your registered mobile number'}`
+    );
+    event.currentTarget.href = `mailto:info@dirtfree.in?subject=${subject}&body=${body}`;
   });
 
   modal.querySelector('#dirtfreeAuthForm').addEventListener('submit', async (event) => {
@@ -912,6 +935,7 @@ CartManager.prototype.setAuthMode = function(mode) {
   const heading = modal.querySelector('.auth-header h3');
   const subText = modal.querySelector('.auth-header p');
   const nameRow = modal.querySelector('#authNameRow');
+  const forgotPasswordLink = modal.querySelector('.auth-forgot-password');
 
   if (mode === 'signup') {
     heading.textContent = 'Create your account';
@@ -919,12 +943,14 @@ CartManager.prototype.setAuthMode = function(mode) {
     passwordInput.placeholder = 'Create a password';
     submitButton.textContent = 'Create account';
     nameRow.style.display = 'grid';
+    forgotPasswordLink.style.display = 'none';
   } else {
     heading.textContent = 'Welcome back';
     subText.textContent = 'Sign in to place your order and view your booking history.';
     passwordInput.placeholder = 'Enter your password';
     submitButton.textContent = 'Continue';
     nameRow.style.display = 'none';
+    forgotPasswordLink.style.display = 'block';
   }
 
   form.reset();
